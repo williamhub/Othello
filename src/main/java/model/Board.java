@@ -62,6 +62,18 @@ public class Board {
     this.board = board;
   }
 
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        builder.append(board.get(row).get(col).toString());
+      }
+      builder.append("\n");
+    }
+
+    return builder.toString();
+  }
+
   @Override public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
