@@ -3,10 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.Cell.BLACK;
-import static model.Cell.EMPTY;
-import static model.Cell.WHITE;
-
 public class Board {
   public final static int DIMENSION = 8;
 
@@ -38,15 +34,15 @@ public class Board {
     int rightCol = DIMENSION / 2;
 
     if (row == topRow && col == leftCol) {
-      return WHITE;
+      return new Cell(Piece.WHITE, row, col);
     } else if (row == topRow && col == rightCol) {
-      return BLACK;
+      return new Cell(Piece.BLACK, row, col);
     } else if (row == bottomRow && col == leftCol) {
-      return BLACK;
+      return new Cell(Piece.BLACK, row, col);
     } else if (row == bottomRow && col == rightCol) {
-      return WHITE;
+      return new Cell(Piece.WHITE, row, col);
     } else {
-      return EMPTY;
+      return new Cell(row, col);
     }
   }
 
