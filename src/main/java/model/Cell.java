@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 public class Cell {
 
-  private static final String EMPTY_CELL = "0";
+  private final static String EMPTY_CELL = "0";
 
   private Piece piece;
 
@@ -21,6 +21,10 @@ public class Cell {
 
   public Optional<Piece> getPiece() {
     return Optional.fromNullable(piece);
+  }
+
+  public void setPiece(Piece piece) {
+    this.piece = piece;
   }
 
   public Coordinate getCoordinate() {
