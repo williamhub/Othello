@@ -4,33 +4,31 @@ import com.google.common.base.Optional;
 
 public class Cell {
 
-  private static final String EMPTY_CELL = "0";
+  private final static String EMPTY_CELL = "0";
 
   private Piece piece;
 
-  private int row, col;
+  private Coordinate coordinate;
 
-  public Cell(Piece piece, int row, int col) {
+  public Cell(Piece piece, Coordinate coordinate) {
     this.piece = piece;
-    this.row = row;
-    this.col = col;
+    this.coordinate = coordinate;
   }
 
-  public Cell(int row, int col) {
-    this.row = row;
-    this.col = col;
+  public Cell(Coordinate coordinate) {
+    this.coordinate = coordinate;
   }
 
   public Optional<Piece> getPiece() {
     return Optional.fromNullable(piece);
   }
 
-  public int getCol() {
-    return col;
+  public void setPiece(Piece piece) {
+    this.piece = piece;
   }
 
-  public int getRow() {
-    return row;
+  public Coordinate getCoordinate() {
+    return coordinate;
   }
 
   @Override public String toString() {
