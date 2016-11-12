@@ -33,16 +33,18 @@ public class Board {
     int leftCol = DIMENSION / 2 - 1;
     int rightCol = DIMENSION / 2;
 
+    Coordinate coordinate = new Coordinate(row, col);
+
     if (row == topRow && col == leftCol) {
-      return new Cell(Piece.WHITE, row, col);
+      return new Cell(Piece.WHITE, coordinate);
     } else if (row == topRow && col == rightCol) {
-      return new Cell(Piece.BLACK, row, col);
+      return new Cell(Piece.BLACK, coordinate);
     } else if (row == bottomRow && col == leftCol) {
-      return new Cell(Piece.BLACK, row, col);
+      return new Cell(Piece.BLACK, coordinate);
     } else if (row == bottomRow && col == rightCol) {
-      return new Cell(Piece.WHITE, row, col);
+      return new Cell(Piece.WHITE, coordinate);
     } else {
-      return new Cell(row, col);
+      return new Cell(coordinate);
     }
   }
 
