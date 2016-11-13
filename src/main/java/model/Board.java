@@ -1,12 +1,13 @@
 package model;
 
 import com.google.common.base.Optional;
+import delegate.BoardDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class Board {
+public class Board implements BoardDelegate {
   public final static int DIMENSION = 8;
 
   private final static List<Coordinate> DIRECTIONS = new ArrayList<>();
@@ -178,6 +179,36 @@ public class Board {
     // prevent initialization
   }
 
+  @Override public boolean isEnd() {
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        Cell white = new Cell(Piece.WHITE, coordinate);
+        Cell black = new Cell(Piece.BLACK, coordinate);
+        if (checkOrValidateBoardFromCell(this, white, true) || checkOrValidateBoardFromCell(this,
+            black, true)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override public List<Board> getValidChildBoard(Piece piece) {
+    List<Board> childBoards = new ArrayList<>();
+
+    List<Coordinate> potentialMoves = getPotentialMoves(piece);
+    for (Coordinate potentialMove : potentialMoves) {
+      Optional<Board> optional = placePiece(potentialMove, piece);
+      if (optional.isPresent()) {
+        childBoards.add(optional.get());
+      }
+    }
+
+    return childBoards;
+  }
+
+  @Override
   public Optional<Board> placePiece(Coordinate coordinate, Piece piece) {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
@@ -192,6 +223,26 @@ public class Board {
     }
 
     return Optional.absent();
+  }
+
+  @Override public Piece getWinner() {
+    return null;
+  }
+
+  public List<Coordinate> getPotentialMoves(Piece piece) {
+    List<Coordinate> coordinates = new ArrayList<>();
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        Cell cell = new Cell(piece, coordinate);
+        if (checkOrValidateBoardFromCell(this, cell, true)) {
+          coordinates.add(coordinate);
+        }
+      }
+    }
+
+    return coordinates;
   }
 
   public Optional<Cell> getBoardCell(Coordinate coordinate) {
