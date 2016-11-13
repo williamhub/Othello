@@ -42,7 +42,9 @@ public class BoardTest {
     for (int index = 0; index < expected.length; index++) {
       Cell cell = cells[index];
       if (cell.getPiece().isPresent()) {
-        assertEquals(expected[index], Board.checkOrValidateBoardFromCell(board, cell, true));
+        assertEquals(expected[index],
+            Board.checkOrValidateBoardFromCell(board, cell.getCoordinate(), cell.getPiece().get(),
+                true));
       } else {
         fail();
       }

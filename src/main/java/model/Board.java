@@ -83,60 +83,58 @@ public class Board implements BoardDelegate {
         || coordinate.col > DIMENSION - 1);
   }
 
-  public static boolean checkOrValidateBoardFromCell(Board board, Cell cell,
+  public static boolean checkOrValidateBoardFromCell(Board board, Coordinate coordinate,
+      Piece piece,
       boolean isToValidate) {
     checkArgument(board != null, "Board must be set");
-    checkArgument(cell != null, "Cell must be set");
+    checkArgument(coordinate != null, "Coordinate must be set");
+    checkArgument(piece != null, "Piece must be set");
 
-    if (cell.getPiece().isPresent()) {
-      @SuppressWarnings("OptionalGetWithoutIsPresent") Piece piece = cell.getPiece().get();
-      Coordinate coordinate = cell.getCoordinate();
+    for (Coordinate direction : DIRECTIONS) {
+      Coordinate neighbourCoordinate =
+          new Coordinate(coordinate.row + direction.row, coordinate.col + direction.col);
 
-      for (Coordinate direction : DIRECTIONS) {
-        Coordinate neighbourCoordinate =
-            new Coordinate(coordinate.row + direction.row, coordinate.col + direction.col);
+      Optional<Cell> optionalCell = board.getBoardCell(neighbourCoordinate);
+      if (optionalCell.isPresent()) {
+        Cell neighbourCell = optionalCell.get();
 
-        Optional<Cell> optionalCell = board.getBoardCell(neighbourCoordinate);
-        if (optionalCell.isPresent()) {
-          Cell neighbourCell = optionalCell.get();
+        Optional<Piece> optionalPiece = neighbourCell.getPiece();
+        if (optionalPiece.isPresent()) {
+          Piece neighbourPiece = optionalPiece.get();
 
-          Optional<Piece> optionalPiece = neighbourCell.getPiece();
-          if (optionalPiece.isPresent()) {
-            Piece neighbourPiece = optionalPiece.get();
+          if (neighbourPiece == piece) {
+            continue;
+          }
 
-            if (neighbourPiece == piece) {
-              continue;
-            }
+          while (true) {
+            Coordinate nextNeighbourCoordinate =
+                new Coordinate(neighbourCell.getCoordinate().row + direction.row,
+                    neighbourCell.getCoordinate().col + +direction.col);
 
-            while (true) {
-              Coordinate nextNeighbourCoordinate =
-                  new Coordinate(neighbourCell.getCoordinate().row + direction.row,
-                      neighbourCell.getCoordinate().col + +direction.col);
+            optionalCell = board.getBoardCell(nextNeighbourCoordinate);
+            if (optionalCell.isPresent()) {
+              Cell nextNeighbourCell = optionalCell.get();
 
-              optionalCell = board.getBoardCell(nextNeighbourCoordinate);
-              if (optionalCell.isPresent()) {
-                Cell nextNeighbourCell = optionalCell.get();
+              optionalPiece = nextNeighbourCell.getPiece();
+              if (optionalPiece.isPresent()) {
+                Piece nextNeighbourPiece = optionalPiece.get();
 
-                optionalPiece = nextNeighbourCell.getPiece();
-                if (optionalPiece.isPresent()) {
-                  Piece nextNeighbourPiece = optionalPiece.get();
-
-                  if (nextNeighbourPiece == piece) {
-                    if (isToValidate) {
-                      return true;
-                    } else {
-                      updateBoard(board, cell, nextNeighbourCell, direction);
-                      break;
-                    }
+                if (nextNeighbourPiece == piece) {
+                  if (isToValidate) {
+                    return true;
+                  } else {
+                    Cell start = new Cell(piece, coordinate);
+                    updateBoard(board, start, nextNeighbourCell, direction);
+                    break;
                   }
-
-                  neighbourCell = nextNeighbourCell;
-                } else {
-                  break;
                 }
+
+                neighbourCell = nextNeighbourCell;
               } else {
                 break;
               }
+            } else {
+              break;
             }
           }
         }
@@ -183,10 +181,9 @@ public class Board implements BoardDelegate {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        Cell white = new Cell(Piece.WHITE, coordinate);
-        Cell black = new Cell(Piece.BLACK, coordinate);
-        if (checkOrValidateBoardFromCell(this, white, true) || checkOrValidateBoardFromCell(this,
-            black, true)) {
+        if (checkOrValidateBoardFromCell(this, coordinate, Piece.WHITE, true)
+            || checkOrValidateBoardFromCell(this, coordinate,
+            Piece.BLACK, true)) {
           return false;
         }
       }
@@ -213,12 +210,10 @@ public class Board implements BoardDelegate {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    Cell currentCell = new Cell(piece, coordinate);
-
-    if (checkOrValidateBoardFromCell(this, currentCell, true)) {
+    if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
       Board newBoard = newInstance(board);
       newBoard.setBoardCell(coordinate, piece);
-      checkOrValidateBoardFromCell(newBoard, currentCell, false);
+      checkOrValidateBoardFromCell(newBoard, coordinate, piece, false);
       return Optional.of(newBoard);
     }
 
@@ -235,8 +230,7 @@ public class Board implements BoardDelegate {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        Cell cell = new Cell(piece, coordinate);
-        if (checkOrValidateBoardFromCell(this, cell, true)) {
+        if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
           coordinates.add(coordinate);
         }
       }
