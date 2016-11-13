@@ -237,6 +237,10 @@ public class Board implements BoardDelegate {
     }
   }
 
+  @Override public void printBoard() {
+    System.out.println(toString());
+  }
+
   public List<Coordinate> getPotentialMoves(Piece piece) {
     List<Coordinate> coordinates = new ArrayList<>();
 

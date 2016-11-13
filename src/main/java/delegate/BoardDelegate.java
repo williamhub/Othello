@@ -16,4 +16,6 @@ public interface BoardDelegate {
   Optional<Board> placePiece(Coordinate coordinate, Piece piece);
 
   GameResult getWinner();
+
+  void printBoard();
 }
