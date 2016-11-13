@@ -220,8 +220,21 @@ public class Board implements BoardDelegate {
     return Optional.absent();
   }
 
-  @Override public Piece getWinner() {
-    return null;
+  @Override public GameResult getWinner() {
+    if (!isEnd()) {
+      throw new IllegalStateException("The game is end yet");
+    }
+
+    int whiteCount = countPieces(Piece.WHITE);
+    int blackCount = countPieces(Piece.BLACK);
+
+    if (whiteCount < blackCount) {
+      return GameResult.BLACK;
+    } else if (whiteCount > blackCount) {
+      return GameResult.WHITE;
+    } else {
+      return GameResult.TIE;
+    }
   }
 
   public List<Coordinate> getPotentialMoves(Piece piece) {
@@ -237,6 +250,23 @@ public class Board implements BoardDelegate {
     }
 
     return coordinates;
+  }
+
+  public int countPieces(Piece piece) {
+    int result = 0;
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Optional<Piece> optional = board.get(row).get(col).getPiece();
+        if (optional.isPresent()) {
+          if (optional.get() == piece) {
+            result++;
+          }
+        }
+      }
+    }
+
+    return result;
   }
 
   public Optional<Cell> getBoardCell(Coordinate coordinate) {

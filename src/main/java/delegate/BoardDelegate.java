@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import java.util.List;
 import model.Board;
 import model.Coordinate;
+import model.GameResult;
 import model.Piece;
 
 public interface BoardDelegate {
@@ -14,5 +15,5 @@ public interface BoardDelegate {
 
   Optional<Board> placePiece(Coordinate coordinate, Piece piece);
 
-  Piece getWinner();
+  GameResult getWinner();
 }
