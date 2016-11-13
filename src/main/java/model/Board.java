@@ -83,6 +83,10 @@ public class Board implements BoardDelegate {
         || coordinate.col > DIMENSION - 1);
   }
 
+  /**
+   * @param isToValidate true if only check board, otherwise update board by all lines cross the
+   * given coordinate
+   */
   public static boolean checkOrValidateBoardFromCell(Board board, Coordinate coordinate,
       Piece piece,
       boolean isToValidate) {
@@ -237,6 +241,10 @@ public class Board implements BoardDelegate {
     }
   }
 
+  @Override public void printBoard() {
+    System.out.println(toString());
+  }
+
   public List<Coordinate> getPotentialMoves(Piece piece) {
     List<Coordinate> coordinates = new ArrayList<>();
 
@@ -290,7 +298,21 @@ public class Board implements BoardDelegate {
   }
 
   public void setBoard(List<List<Cell>> board) {
-    this.board = board;
+    List<List<Cell>> newBoard = new ArrayList<>();
+    for (int row = 0; row < DIMENSION; row++) {
+      List<Cell> newRow = new ArrayList<>();
+      for (int col = 0; col < DIMENSION; col++) {
+        Cell cell = board.get(row).get(col);
+        Optional<Piece> pieceOptional = cell.getPiece();
+        if (pieceOptional.isPresent()) {
+          newRow.add(new Cell(pieceOptional.get(), cell.getCoordinate()));
+        } else {
+          newRow.add(new Cell(cell.getCoordinate()));
+        }
+      }
+      newBoard.add(newRow);
+    }
+    this.board = newBoard;
   }
 
   public String toString() {
