@@ -42,7 +42,9 @@ public class BoardTest {
     for (int index = 0; index < expected.length; index++) {
       Cell cell = cells[index];
       if (cell.getPiece().isPresent()) {
-        assertEquals(expected[index], Board.checkOrValidateBoardFromCell(board, cell, true));
+        assertEquals(expected[index],
+            Board.checkOrValidateBoardFromCell(board, cell.getCoordinate(), cell.getPiece().get(),
+                true));
       } else {
         fail();
       }
@@ -65,6 +67,25 @@ public class BoardTest {
         + "00000000\n"
         + "00000000\n"
         + "00000000\n";
+    String actual = board.toString();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testMove() {
+    Board board = Board.newInstance();
+    board = board.placePiece(new Coordinate(3, 2), Piece.BLACK).get();
+
+    String expected = "00000000\n"
+        + "00000000\n"
+        + "00000000\n"
+        + "00BBB000\n"
+        + "000BW000\n"
+        + "00000000\n"
+        + "00000000\n"
+        + "00000000\n";
+
     String actual = board.toString();
 
     assertEquals(expected, actual);
