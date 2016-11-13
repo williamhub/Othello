@@ -36,6 +36,12 @@ public class Board {
     return board;
   }
 
+  public static Board newInstance(List<List<Cell>> cells) {
+    Board board = new Board();
+    board.setBoard(cells);
+    return board;
+  }
+
   private static List<List<Cell>> constructInitialBoard() {
     List<List<Cell>> initialBoard = new ArrayList<>();
     for (int row = 0; row < DIMENSION; row++) {
@@ -170,6 +176,22 @@ public class Board {
 
   private Board() {
     // prevent initialization
+  }
+
+  public Optional<Board> placePiece(Coordinate coordinate, Piece piece) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+    checkArgument(piece != null, "Piece must be set");
+
+    Cell currentCell = new Cell(piece, coordinate);
+
+    if (checkOrValidateBoardFromCell(this, currentCell, true)) {
+      Board newBoard = newInstance(board);
+      newBoard.setBoardCell(coordinate, piece);
+      checkOrValidateBoardFromCell(newBoard, currentCell, false);
+      return Optional.of(newBoard);
+    }
+
+    return Optional.absent();
   }
 
   public Optional<Cell> getBoardCell(Coordinate coordinate) {

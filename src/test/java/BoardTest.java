@@ -69,4 +69,23 @@ public class BoardTest {
 
     assertEquals(expected, actual);
   }
+
+  @Test
+  public void testMove() {
+    Board board = Board.newInstance();
+    board = board.placePiece(new Coordinate(3, 2), Piece.BLACK).get();
+
+    String expected = "00000000\n"
+        + "00000000\n"
+        + "00000000\n"
+        + "00BBB000\n"
+        + "000BW000\n"
+        + "00000000\n"
+        + "00000000\n"
+        + "00000000\n";
+
+    String actual = board.toString();
+
+    assertEquals(expected, actual);
+  }
 }
