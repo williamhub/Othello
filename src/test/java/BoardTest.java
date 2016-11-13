@@ -53,23 +53,54 @@ public class BoardTest {
 
   @Test
   public void testUpdateBoard() {
-    Board board = Board.newInstance();
-    Cell start = board.setBoardCell(new Coordinate(3, 2), Piece.BLACK);
-    Cell end = board.getBoardCell(new Coordinate(3, 4)).get();
-    Coordinate direction = new Coordinate(0, 1);
-    Board.updateBoard(board, start, end, direction);
+    Board[] boards =
+        new Board[] {Board.newInstance(), Fixtures.createBoard(), Fixtures.createBoard()};
 
-    String expected = "00000000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00BBB000\n"
-        + "000BW000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00000000\n";
-    String actual = board.toString();
+    Cell[] starts = new Cell[] {boards[0].setBoardCell(new Coordinate(3, 2), Piece.BLACK),
+        boards[1].setBoardCell(new Coordinate(5, 5), Piece.BLACK),
+        boards[2].setBoardCell(new Coordinate(5, 2), Piece.BLACK)};
+    Cell[] ends = new Cell[] {boards[0].getBoardCell(new Coordinate(3, 4)).get(),
+        boards[1].getBoardCell(new Coordinate(2, 2)).get(),
+        boards[2].getBoardCell(new Coordinate(3, 2)).get()};
+    Coordinate[] directions =
+        new Coordinate[] {new Coordinate(0, 1), new Coordinate(-1, -1), new Coordinate(-1, 0)};
 
-    assertEquals(expected, actual);
+    String[] expected = new String[] {
+        "00000000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00BBB000\n"
+            + "000BW000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n",
+        "00000000\n"
+            + "00B00000\n"
+            + "00B00000\n"
+            + "00BBB000\n"
+            + "00WWB000\n"
+            + "00000B00\n"
+            + "00000000\n"
+            + "00000000\n",
+        "00000000\n"
+            + "00B00000\n"
+            + "00B00000\n"
+            + "00BWB000\n"
+            + "00BWW000\n"
+            + "00B00000\n"
+            + "00000000\n"
+            + "00000000\n"
+    };
+    String[] actual = new String[expected.length];
+    for (int index = 0; index < boards.length; index++) {
+      Board.updateBoard(boards[index], starts[index], ends[index], directions[index]);
+      actual[index] = boards[index].toString();
+    }
+
+    for (int index = 0; index < expected.length; index++) {
+      assertEquals(expected[index], actual[index]
+      );
+    }
   }
 
   @Test
