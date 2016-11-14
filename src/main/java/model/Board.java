@@ -251,8 +251,10 @@ public class Board implements BoardDelegate {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
-          coordinates.add(coordinate);
+        if (!this.board.get(row).get(col).getPiece().isPresent()) {
+          if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
+            coordinates.add(coordinate);
+          }
         }
       }
     }
