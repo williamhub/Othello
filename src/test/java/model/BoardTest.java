@@ -1,3 +1,5 @@
+package model;
+
 import model.Board;
 import model.Cell;
 import model.Coordinate;

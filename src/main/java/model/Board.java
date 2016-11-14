@@ -241,8 +241,8 @@ public class Board implements BoardDelegate {
     }
   }
 
-  @Override public void printBoard() {
-    System.out.println(toString());
+  @Override public String getBoardLayout() {
+    return toString();
   }
 
   public List<Coordinate> getPotentialMoves(Piece piece) {
