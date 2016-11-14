@@ -11,7 +11,7 @@ public class Othello {
 
   public static void main(String[] args) {
     GameEngine gameEngine = new GameEngine();
-    gameEngine.printBoard();
+    System.out.println(gameEngine.getBoardLayout());
 
     Scanner scanner = new Scanner(System.in);
 
@@ -22,7 +22,7 @@ public class Othello {
       int col = lineScanner.nextInt();
 
       gameEngine.placePiece(new Coordinate(row, col), Piece.BLACK);
-      gameEngine.printBoard();
+      System.out.println(gameEngine.getBoardLayout());
     }
   }
 }

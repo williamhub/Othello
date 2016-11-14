@@ -17,5 +17,6 @@ public interface BoardDelegate {
 
   GameResult getWinner();
 
-  void printBoard();
+  String getBoardLayout();
+
 }
