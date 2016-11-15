@@ -1,9 +1,6 @@
 package engine;
 
-import com.google.common.base.Optional;
-import delegate.BoardDelegate;
 import java.util.Scanner;
-import model.Board;
 import model.Coordinate;
 import model.Piece;
 

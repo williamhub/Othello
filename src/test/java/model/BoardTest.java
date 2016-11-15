@@ -1,9 +1,5 @@
 package model;
 
-import model.Board;
-import model.Cell;
-import model.Coordinate;
-import model.Piece;
 import org.junit.Test;
 
 import static junit.framework.TestCase.fail;
@@ -13,14 +9,15 @@ public class BoardTest {
   @Test
   public void testToString() {
     Board board = Board.newInstance();
-    String expected = "00000000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "000WB000\n"
-        + "000BW000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00000000\n";
+    String expected =
+        "00000000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "000WB000\n"
+            + "000BW000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n";
     String actual = board.toString();
 
     assertEquals(expected, actual);
@@ -86,7 +83,7 @@ public class BoardTest {
       Cell cell = cells[index];
       if (cell.getPiece().isPresent()) {
         assertEquals(expected[index],
-            Board.checkOrValidateBoardFromCell(board, cell.getCoordinate(), cell.getPiece().get(),
+            board.checkOrValidateBoardFromCell(cell.getCoordinate(), cell.getPiece().get(),
                 true));
       } else {
         fail();
@@ -136,7 +133,7 @@ public class BoardTest {
     };
     String[] actual = new String[expected.length];
     for (int index = 0; index < boards.length; index++) {
-      Board.updateBoard(boards[index], starts[index], ends[index], directions[index]);
+      boards[index].updateBoard(starts[index], ends[index], directions[index]);
       actual[index] = boards[index].toString();
     }
 
@@ -151,14 +148,15 @@ public class BoardTest {
     Board board = Board.newInstance();
     board = board.placePiece(new Coordinate(3, 2), Piece.BLACK).get();
 
-    String expected = "00000000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00BBB000\n"
-        + "000BW000\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00000000\n";
+    String expected =
+        "00000000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00BBB000\n"
+            + "000BW000\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n";
 
     String actual = board.toString();
 

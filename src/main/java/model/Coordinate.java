@@ -9,6 +9,10 @@ public class Coordinate {
     this.col = col;
   }
 
+  public Coordinate move(Coordinate coordinate) {
+    return new Coordinate(this.row + coordinate.row, this.col + coordinate.col);
+  }
+
   @Override public String toString() {
     return String.format("{%s, %s}", row, col);
   }

@@ -13,6 +13,7 @@ import model.Coordinate;
 import model.Piece;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 public class GameEngine {
   BoardDelegate boardDelegate;
@@ -22,6 +23,7 @@ public class GameEngine {
   }
 
   public void placePiece(Coordinate coordinate, Piece piece) {
+    checkState(boardDelegate != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
@@ -42,10 +44,16 @@ public class GameEngine {
 
       if (!validChildes.isEmpty()) {
         boardDelegate = validChildes.get(0);
+      } else {
+        System.out.printf("Skipped %s piece step", piece);
       }
     } else {
       System.out.printf("You can not put %s on %s \n", piece, coordinate);
     }
+  }
+
+  public boolean isFinished() {
+    return boardDelegate.isEnd();
   }
 
   public String getBoardLayout() {
