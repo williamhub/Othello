@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 public class Board implements BoardDelegate {
   public final static int DIMENSION = 8;
@@ -30,10 +31,13 @@ public class Board implements BoardDelegate {
 
   private List<List<Cell>> board;
 
+  /**
+   * Board Constructor
+   */
+
   public static Board newInstance() {
-    List<List<Cell>> cells = constructInitialBoard();
     Board board = new Board();
-    board.setBoard(cells);
+    board.initializeBoard();
     return board;
   }
 
@@ -43,19 +47,18 @@ public class Board implements BoardDelegate {
     return board;
   }
 
-  private static List<List<Cell>> constructInitialBoard() {
-    List<List<Cell>> initialBoard = new ArrayList<>();
+  private void initializeBoard() {
+    this.board = new ArrayList<>();
     for (int row = 0; row < DIMENSION; row++) {
       List<Cell> initialRow = new ArrayList<>();
       for (int col = 0; col < DIMENSION; col++) {
-        initialRow.add(constructInitialCell(row, col));
+        initialRow.add(generateCell(row, col));
       }
-      initialBoard.add(initialRow);
+      this.board.add(initialRow);
     }
-    return initialBoard;
   }
 
-  private static Cell constructInitialCell(int row, int col) {
+  private Cell generateCell(int row, int col) {
     int topRow = DIMENSION / 2 - 1;
     int bottomRow = DIMENSION / 2;
     int leftCol = DIMENSION / 2 - 1;
@@ -76,21 +79,42 @@ public class Board implements BoardDelegate {
     }
   }
 
-  private static boolean isWithinBoard(Coordinate coordinate) {
-    return !(coordinate.row < 0
-        || coordinate.row > DIMENSION - 1
-        || coordinate.col < 0
-        || coordinate.col > DIMENSION - 1);
+  public void setBoard(List<List<Cell>> board) {
+    List<List<Cell>> newBoard = new ArrayList<>();
+    for (int row = 0; row < DIMENSION; row++) {
+      List<Cell> newRow = new ArrayList<>();
+      for (int col = 0; col < DIMENSION; col++) {
+        Cell cell = board.get(row).get(col);
+        Optional<Piece> pieceOptional = cell.getPiece();
+        if (pieceOptional.isPresent()) {
+          newRow.add(new Cell(pieceOptional.get(), cell.getCoordinate()));
+        } else {
+          newRow.add(new Cell(cell.getCoordinate()));
+        }
+      }
+      newBoard.add(newRow);
+    }
+    this.board = newBoard;
+  }
+
+  private Board() {
+    // prevent initialization
   }
 
   /**
+   * Board Core Operations
+   */
+
+  /**
+   * Check or validate board from a target cell.
+   *
    * @param isToValidate true if only check board, otherwise update board by all lines cross the
    * given coordinate
    */
-  public static boolean checkOrValidateBoardFromCell(Board board, Coordinate coordinate,
+  public boolean checkOrValidateBoardFromCell(Coordinate coordinate,
       Piece piece,
       boolean isToValidate) {
-    checkArgument(board != null, "Board must be set");
+    checkState(this.board != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
@@ -98,7 +122,7 @@ public class Board implements BoardDelegate {
       Coordinate neighbourCoordinate =
           new Coordinate(coordinate.row + direction.row, coordinate.col + direction.col);
 
-      Optional<Cell> optionalCell = board.getBoardCell(neighbourCoordinate);
+      Optional<Cell> optionalCell = getBoardCell(neighbourCoordinate);
       if (optionalCell.isPresent()) {
         Cell neighbourCell = optionalCell.get();
 
@@ -115,7 +139,7 @@ public class Board implements BoardDelegate {
                 new Coordinate(neighbourCell.getCoordinate().row + direction.row,
                     neighbourCell.getCoordinate().col + +direction.col);
 
-            optionalCell = board.getBoardCell(nextNeighbourCoordinate);
+            optionalCell = getBoardCell(nextNeighbourCoordinate);
             if (optionalCell.isPresent()) {
               Cell nextNeighbourCell = optionalCell.get();
 
@@ -128,7 +152,7 @@ public class Board implements BoardDelegate {
                     return true;
                   } else {
                     Cell start = new Cell(piece, coordinate);
-                    updateBoard(board, start, nextNeighbourCell, direction);
+                    updateBoard(start, nextNeighbourCell, direction);
                     break;
                   }
                 }
@@ -148,9 +172,9 @@ public class Board implements BoardDelegate {
     return false;
   }
 
-  public static void updateBoard(Board board, Cell start, Cell end,
+  public void updateBoard(Cell start, Cell end,
       Coordinate direction) {
-    checkArgument(board != null, "Board must be set");
+    checkState(this.board != null);
     checkArgument(start != null, "start Cell must be set");
     checkArgument(end != null, "end Cell must be set");
     checkArgument(direction != null, "direction Coordinate must be set");
@@ -163,7 +187,7 @@ public class Board implements BoardDelegate {
     while (currentCell != end) {
       currentCell.setPiece(end.getPiece().get());
 
-      Optional<Cell> optional = board.getBoardCell(
+      Optional<Cell> optional = getBoardCell(
           new Coordinate(currentCell.getCoordinate().row + direction.row,
               currentCell.getCoordinate().col + direction.col));
 
@@ -177,16 +201,50 @@ public class Board implements BoardDelegate {
     }
   }
 
-  private Board() {
-    // prevent initialization
+  public List<Coordinate> getPotentialMoves(Piece piece) {
+    List<Coordinate> coordinates = new ArrayList<>();
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        if (!this.board.get(row).get(col).getPiece().isPresent()) {
+          if (checkOrValidateBoardFromCell(coordinate, piece, true)) {
+            coordinates.add(coordinate);
+          }
+        }
+      }
+    }
+
+    return coordinates;
   }
+
+  public int countPieces(Piece piece) {
+    int result = 0;
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Optional<Piece> optional = this.board.get(row).get(col).getPiece();
+        if (optional.isPresent()) {
+          if (optional.get() == piece) {
+            result++;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Board Delegate Implementations
+   */
 
   @Override public boolean isEnd() {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        if (checkOrValidateBoardFromCell(this, coordinate, Piece.WHITE, true)
-            || checkOrValidateBoardFromCell(this, coordinate,
+        if (checkOrValidateBoardFromCell(coordinate, Piece.WHITE, true)
+            || checkOrValidateBoardFromCell(coordinate,
             Piece.BLACK, true)) {
           return false;
         }
@@ -214,10 +272,10 @@ public class Board implements BoardDelegate {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
-      Board newBoard = newInstance(board);
+    if (checkOrValidateBoardFromCell(coordinate, piece, true)) {
+      Board newBoard = newInstance(this.board);
       newBoard.setBoardCell(coordinate, piece);
-      checkOrValidateBoardFromCell(newBoard, coordinate, piece, false);
+      newBoard.checkOrValidateBoardFromCell(coordinate, piece, false);
       return Optional.of(newBoard);
     }
 
@@ -245,44 +303,21 @@ public class Board implements BoardDelegate {
     return toString();
   }
 
-  public List<Coordinate> getPotentialMoves(Piece piece) {
-    List<Coordinate> coordinates = new ArrayList<>();
+  /**
+   * Board Helper Methods.
+   */
 
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        Coordinate coordinate = new Coordinate(row, col);
-        if (!this.board.get(row).get(col).getPiece().isPresent()) {
-          if (checkOrValidateBoardFromCell(this, coordinate, piece, true)) {
-            coordinates.add(coordinate);
-          }
-        }
-      }
-    }
-
-    return coordinates;
-  }
-
-  public int countPieces(Piece piece) {
-    int result = 0;
-
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        Optional<Piece> optional = board.get(row).get(col).getPiece();
-        if (optional.isPresent()) {
-          if (optional.get() == piece) {
-            result++;
-          }
-        }
-      }
-    }
-
-    return result;
+  private boolean isWithinBoard(Coordinate coordinate) {
+    return !(coordinate.row < 0
+        || coordinate.row > DIMENSION - 1
+        || coordinate.col < 0
+        || coordinate.col > DIMENSION - 1);
   }
 
   public Optional<Cell> getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
 
-    return isWithinBoard(coordinate) ? Optional.of(board.get(coordinate.row).get(coordinate.col))
+    return isWithinBoard(coordinate) ? Optional.of(this.board.get(coordinate.row).get(coordinate.col))
         : Optional.<Cell>absent();
   }
 
@@ -294,34 +329,16 @@ public class Board implements BoardDelegate {
       throw new IllegalArgumentException(String.format("%s is not valid coordiate", coordinate));
     }
 
-    board.get(coordinate.row).get(coordinate.col).setPiece(piece);
+    this.board.get(coordinate.row).get(coordinate.col).setPiece(piece);
 
-    return board.get(coordinate.row).get(coordinate.col);
-  }
-
-  public void setBoard(List<List<Cell>> board) {
-    List<List<Cell>> newBoard = new ArrayList<>();
-    for (int row = 0; row < DIMENSION; row++) {
-      List<Cell> newRow = new ArrayList<>();
-      for (int col = 0; col < DIMENSION; col++) {
-        Cell cell = board.get(row).get(col);
-        Optional<Piece> pieceOptional = cell.getPiece();
-        if (pieceOptional.isPresent()) {
-          newRow.add(new Cell(pieceOptional.get(), cell.getCoordinate()));
-        } else {
-          newRow.add(new Cell(cell.getCoordinate()));
-        }
-      }
-      newBoard.add(newRow);
-    }
-    this.board = newBoard;
+    return this.board.get(coordinate.row).get(coordinate.col);
   }
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
-        builder.append(board.get(row).get(col).toString());
+        builder.append(this.board.get(row).get(col).toString());
       }
       builder.append("\n");
     }
@@ -329,13 +346,13 @@ public class Board implements BoardDelegate {
     return builder.toString();
   }
 
-  @Override public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  @Override public boolean equals(Object other) {
+    if (this == other) return true;
+    if (other == null || getClass() != other.getClass()) return false;
 
-    Board board1 = (Board) o;
+    Board otherBoard = (Board) other;
 
-    return board.equals(board1.board);
+    return board.equals(otherBoard.board);
   }
 
   @Override public int hashCode() {

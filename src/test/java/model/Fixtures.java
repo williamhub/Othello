@@ -22,8 +22,6 @@ public class Fixtures {
    * 00000000
    * 00000000
    * 00000000
-   *
-   * @return
    */
   public static Board createBoard() {
     List<List<Cell>> cells = new ArrayList<>();
