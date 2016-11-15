@@ -119,53 +119,46 @@ public class Board implements BoardDelegate {
     checkArgument(piece != null, "Piece must be set");
 
     for (Coordinate direction : DIRECTIONS) {
-      Coordinate neighbourCoordinate =
-          new Coordinate(coordinate.row + direction.row, coordinate.col + direction.col);
-
+      Coordinate neighbourCoordinate = coordinate.move(direction);
       Optional<Cell> optionalCell = getBoardCell(neighbourCoordinate);
-      if (optionalCell.isPresent()) {
-        Cell neighbourCell = optionalCell.get();
+      if (!optionalCell.isPresent()) {
+        continue;
+      }
+      Cell neighbourCell = optionalCell.get();
 
-        Optional<Piece> optionalPiece = neighbourCell.getPiece();
-        if (optionalPiece.isPresent()) {
-          Piece neighbourPiece = optionalPiece.get();
+      if (!neighbourCell.getPiece().isPresent()) {
+        continue;
+      }
 
-          if (neighbourPiece == piece) {
-            continue;
-          }
+      Piece neighbourPiece = neighbourCell.getPiece().get();
+      if (neighbourPiece == piece) {
+        continue;
+      }
 
-          while (true) {
-            Coordinate nextNeighbourCoordinate =
-                new Coordinate(neighbourCell.getCoordinate().row + direction.row,
-                    neighbourCell.getCoordinate().col + +direction.col);
+      while (true) {
+        Coordinate nextNeighbourCoordinate = neighbourCell.getCoordinate().move(direction);
+        optionalCell = getBoardCell(nextNeighbourCoordinate);
+        if (!optionalCell.isPresent()) {
+          break;
+        }
 
-            optionalCell = getBoardCell(nextNeighbourCoordinate);
-            if (optionalCell.isPresent()) {
-              Cell nextNeighbourCell = optionalCell.get();
+        Cell nextNeighbourCell = optionalCell.get();
+        if (!nextNeighbourCell.getPiece().isPresent()) {
+          break;
+        }
 
-              optionalPiece = nextNeighbourCell.getPiece();
-              if (optionalPiece.isPresent()) {
-                Piece nextNeighbourPiece = optionalPiece.get();
-
-                if (nextNeighbourPiece == piece) {
-                  if (isToValidate) {
-                    return true;
-                  } else {
-                    Cell start = new Cell(piece, coordinate);
-                    updateBoard(start, nextNeighbourCell, direction);
-                    break;
-                  }
-                }
-
-                neighbourCell = nextNeighbourCell;
-              } else {
-                break;
-              }
-            } else {
-              break;
-            }
+        Piece nextNeighbourPiece = nextNeighbourCell.getPiece().get();
+        if (nextNeighbourPiece == piece) {
+          if (isToValidate) {
+            return true;
+          } else {
+            Cell start = new Cell(piece, coordinate);
+            updateBoard(start, nextNeighbourCell, direction);
+            break;
           }
         }
+
+        neighbourCell = nextNeighbourCell;
       }
     }
 
@@ -187,9 +180,7 @@ public class Board implements BoardDelegate {
     while (currentCell != end) {
       currentCell.setPiece(end.getPiece().get());
 
-      Optional<Cell> optional = getBoardCell(
-          new Coordinate(currentCell.getCoordinate().row + direction.row,
-              currentCell.getCoordinate().col + direction.col));
+      Optional<Cell> optional = getBoardCell(currentCell.getCoordinate().move(direction));
 
       if (optional.isPresent()) {
         currentCell = optional.get();
@@ -317,7 +308,8 @@ public class Board implements BoardDelegate {
   public Optional<Cell> getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
 
-    return isWithinBoard(coordinate) ? Optional.of(this.board.get(coordinate.row).get(coordinate.col))
+    return isWithinBoard(coordinate) ? Optional.of(
+        this.board.get(coordinate.row).get(coordinate.col))
         : Optional.<Cell>absent();
   }
 
