@@ -19,4 +19,6 @@ public interface BoardDelegate {
 
   String getBoardLayout();
 
+  boolean isWithinBoard(Coordinate coordinate);
+
 }

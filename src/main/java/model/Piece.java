@@ -13,4 +13,15 @@ public enum Piece {
   public String toString() {
     return text;
   }
+
+  public Piece getOpposite() {
+    switch (text) {
+      case "B":
+        return WHITE;
+      case "W":
+        return BLACK;
+      default:
+        throw new IllegalStateException(String.format("Cannot parse %s piece", text));
+    }
+  }
 }

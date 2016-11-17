@@ -294,16 +294,17 @@ public class Board implements BoardDelegate {
     return toString();
   }
 
-  /**
-   * Board Helper Methods.
-   */
-
-  private boolean isWithinBoard(Coordinate coordinate) {
+  @Override
+  public boolean isWithinBoard(Coordinate coordinate) {
     return !(coordinate.row < 0
         || coordinate.row > DIMENSION - 1
         || coordinate.col < 0
         || coordinate.col > DIMENSION - 1);
   }
+
+  /**
+   * Board Helper Methods.
+   */
 
   public Optional<Cell> getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
