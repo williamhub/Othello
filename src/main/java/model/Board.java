@@ -1,14 +1,13 @@
 package model;
 
 import com.google.common.base.Optional;
-import delegate.BoardDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-public class Board implements BoardDelegate {
+public class Board {
   public final static int DIMENSION = 8;
 
   private final static List<Coordinate> DIRECTIONS = new ArrayList<>();
@@ -79,7 +78,7 @@ public class Board implements BoardDelegate {
     }
   }
 
-  public void setBoard(List<List<Cell>> board) {
+  private void setBoard(List<List<Cell>> board) {
     List<List<Cell>> newBoard = new ArrayList<>();
     for (int row = 0; row < DIMENSION; row++) {
       List<Cell> newRow = new ArrayList<>();
@@ -102,8 +101,141 @@ public class Board implements BoardDelegate {
   }
 
   /**
-   * Board Core Operations
+   * Public Methods
    */
+
+  public List<Board> getChildBoards(Piece piece) {
+    List<Board> childBoards = new ArrayList<>();
+
+    List<Coordinate> potentialMoves = getValidMoves(piece);
+    for (Coordinate potentialMove : potentialMoves) {
+      Optional<Board> optional = placePiece(potentialMove, piece);
+      if (optional.isPresent()) {
+        childBoards.add(optional.get());
+      }
+    }
+
+    return childBoards;
+  }
+
+  public List<Coordinate> getValidMoves(Piece piece) {
+    List<Coordinate> coordinates = new ArrayList<>();
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        if (!this.board.get(row).get(col).getPiece().isPresent()) {
+          if (checkOrValidate(coordinate, piece, true)) {
+            coordinates.add(coordinate);
+          }
+        }
+      }
+    }
+
+    return coordinates;
+  }
+
+  public GameResult getWinner() {
+    if (!isEnd()) {
+      throw new IllegalStateException("The game is end yet");
+    }
+
+    int whiteCount = countPieces(Piece.WHITE);
+    int blackCount = countPieces(Piece.BLACK);
+
+    if (whiteCount < blackCount) {
+      return GameResult.BLACK;
+    } else if (whiteCount > blackCount) {
+      return GameResult.WHITE;
+    } else {
+      return GameResult.TIE;
+    }
+  }
+
+  public Optional<Board> placePiece(Coordinate coordinate, Piece piece) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+    checkArgument(piece != null, "Piece must be set");
+
+    if (checkOrValidate(coordinate, piece, true)) {
+      Board newBoard = newInstance(this.board);
+      newBoard.setBoardCell(coordinate, piece);
+      newBoard.checkOrValidate(coordinate, piece, false);
+      return Optional.of(newBoard);
+    }
+
+    return Optional.absent();
+  }
+
+  public boolean isContain(Coordinate coordinate) {
+    return !(coordinate.row < 0
+        || coordinate.row > DIMENSION - 1
+        || coordinate.col < 0
+        || coordinate.col > DIMENSION - 1);
+  }
+
+  public boolean isEnd() {
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        if (checkOrValidate(coordinate, Piece.WHITE, true) || checkOrValidate(coordinate,
+            Piece.BLACK, true)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  public boolean isValid() {
+    if (this.board.size() != DIMENSION) {
+      return false;
+    }
+
+    for (int row = 0; row < this.board.size(); row++) {
+      if (this.board.get(row).size() != DIMENSION) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        builder.append(this.board.get(row).get(col).toString());
+      }
+      builder.append("\n");
+    }
+
+    return builder.toString();
+  }
+
+  /**
+   * Board Helper Methods.
+   */
+
+  private Optional<Cell> getBoardCell(Coordinate coordinate) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+
+    return isContain(coordinate) ? Optional.of(
+        this.board.get(coordinate.row).get(coordinate.col))
+        : Optional.<Cell>absent();
+  }
+
+  private Cell setBoardCell(Coordinate coordinate, Piece piece) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+    checkArgument(piece != null, "Piece must be set");
+
+    if (!isContain(coordinate)) {
+      throw new IllegalArgumentException(String.format("%s is not valid coordiate", coordinate));
+    }
+
+    this.board.get(coordinate.row).get(coordinate.col).setPiece(piece);
+
+    return this.board.get(coordinate.row).get(coordinate.col);
+  }
 
   /**
    * Check or validate board from a target cell.
@@ -111,7 +243,7 @@ public class Board implements BoardDelegate {
    * @param isToValidate true if only check board, otherwise update board by all lines cross the
    * given coordinate
    */
-  public boolean checkOrValidateBoardFromCell(Coordinate coordinate,
+  private boolean checkOrValidate(Coordinate coordinate,
       Piece piece,
       boolean isToValidate) {
     checkState(this.board != null);
@@ -165,7 +297,7 @@ public class Board implements BoardDelegate {
     return false;
   }
 
-  public void updateBoard(Cell start, Cell end,
+  private void updateBoard(Cell start, Cell end,
       Coordinate direction) {
     checkState(this.board != null);
     checkArgument(start != null, "start Cell must be set");
@@ -192,163 +324,22 @@ public class Board implements BoardDelegate {
     }
   }
 
-  public List<Coordinate> getPotentialMoves(Piece piece) {
-    List<Coordinate> coordinates = new ArrayList<>();
-
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        Coordinate coordinate = new Coordinate(row, col);
-        if (!this.board.get(row).get(col).getPiece().isPresent()) {
-          if (checkOrValidateBoardFromCell(coordinate, piece, true)) {
-            coordinates.add(coordinate);
-          }
-        }
-      }
-    }
-
-    return coordinates;
-  }
-
-  public int countPieces(Piece piece) {
+  private int countPieces(Piece piece) {
     int result = 0;
 
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Optional<Piece> optional = this.board.get(row).get(col).getPiece();
-        if (optional.isPresent()) {
-          if (optional.get() == piece) {
-            result++;
-          }
+        if (!optional.isPresent()) {
+          continue;
+        }
+
+        if (optional.get() == piece) {
+          result++;
         }
       }
     }
 
     return result;
-  }
-
-  /**
-   * Board Delegate Implementations
-   */
-
-  @Override public boolean isEnd() {
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        Coordinate coordinate = new Coordinate(row, col);
-        if (checkOrValidateBoardFromCell(coordinate, Piece.WHITE, true)
-            || checkOrValidateBoardFromCell(coordinate,
-            Piece.BLACK, true)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  @Override public List<Board> getValidChildBoard(Piece piece) {
-    List<Board> childBoards = new ArrayList<>();
-
-    List<Coordinate> potentialMoves = getPotentialMoves(piece);
-    for (Coordinate potentialMove : potentialMoves) {
-      Optional<Board> optional = placePiece(potentialMove, piece);
-      if (optional.isPresent()) {
-        childBoards.add(optional.get());
-      }
-    }
-
-    return childBoards;
-  }
-
-  @Override
-  public Optional<Board> placePiece(Coordinate coordinate, Piece piece) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-    checkArgument(piece != null, "Piece must be set");
-
-    if (checkOrValidateBoardFromCell(coordinate, piece, true)) {
-      Board newBoard = newInstance(this.board);
-      newBoard.setBoardCell(coordinate, piece);
-      newBoard.checkOrValidateBoardFromCell(coordinate, piece, false);
-      return Optional.of(newBoard);
-    }
-
-    return Optional.absent();
-  }
-
-  @Override public GameResult getWinner() {
-    if (!isEnd()) {
-      throw new IllegalStateException("The game is end yet");
-    }
-
-    int whiteCount = countPieces(Piece.WHITE);
-    int blackCount = countPieces(Piece.BLACK);
-
-    if (whiteCount < blackCount) {
-      return GameResult.BLACK;
-    } else if (whiteCount > blackCount) {
-      return GameResult.WHITE;
-    } else {
-      return GameResult.TIE;
-    }
-  }
-
-  @Override public String getBoardLayout() {
-    return toString();
-  }
-
-  @Override
-  public boolean isWithinBoard(Coordinate coordinate) {
-    return !(coordinate.row < 0
-        || coordinate.row > DIMENSION - 1
-        || coordinate.col < 0
-        || coordinate.col > DIMENSION - 1);
-  }
-
-  /**
-   * Board Helper Methods.
-   */
-
-  public Optional<Cell> getBoardCell(Coordinate coordinate) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-
-    return isWithinBoard(coordinate) ? Optional.of(
-        this.board.get(coordinate.row).get(coordinate.col))
-        : Optional.<Cell>absent();
-  }
-
-  public Cell setBoardCell(Coordinate coordinate, Piece piece) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-    checkArgument(piece != null, "Piece must be set");
-
-    if (!isWithinBoard(coordinate)) {
-      throw new IllegalArgumentException(String.format("%s is not valid coordiate", coordinate));
-    }
-
-    this.board.get(coordinate.row).get(coordinate.col).setPiece(piece);
-
-    return this.board.get(coordinate.row).get(coordinate.col);
-  }
-
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        builder.append(this.board.get(row).get(col).toString());
-      }
-      builder.append("\n");
-    }
-
-    return builder.toString();
-  }
-
-  @Override public boolean equals(Object other) {
-    if (this == other) return true;
-    if (other == null || getClass() != other.getClass()) return false;
-
-    Board otherBoard = (Board) other;
-
-    return board.equals(otherBoard.board);
-  }
-
-  @Override public int hashCode() {
-    return board.hashCode();
   }
 }

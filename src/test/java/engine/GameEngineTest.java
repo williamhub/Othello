@@ -32,20 +32,4 @@ public class GameEngineTest {
     assertEquals(expected, actual);
   }
 
-  @Test
-  public void testGetFile() {
-    String expected = "00000000\n"
-        + "0WB00000\n"
-        + "00WB0000\n"
-        + "000BWB00\n"
-        + "0000BW00\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00000000\n";
-
-    String actual = gameEngine.getFile("engine/sample_board.txt");
-
-    assertEquals(expected, actual);
-  }
-
 }
