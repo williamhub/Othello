@@ -1,7 +1,6 @@
 package engine;
 
 import com.google.common.base.Optional;
-import delegate.BoardDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,55 +15,57 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 public class GameEngine {
-  BoardDelegate boardDelegate;
+  Board board;
 
   public GameEngine() {
-    this.boardDelegate = Board.newInstance();
+    this.board = Board.newInstance();
   }
 
   public void placePiece(Coordinate coordinate, Piece piece) {
-    checkState(this.boardDelegate != null);
+    checkState(this.board != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    if (!this.boardDelegate.isWithinBoard(coordinate)) {
+    if (!this.board.isContain(coordinate)) {
       System.out.printf("%s is not within the board\n", coordinate);
       return;
     }
 
-    Optional<Board> boardOptional = this.boardDelegate.placePiece(coordinate, piece);
-    if (boardOptional.isPresent()) {
-      this.boardDelegate = boardOptional.get();
-
-      placePieceOpposite(piece.getOpposite());
-
-      while (this.boardDelegate.getValidChildBoard(piece).isEmpty()) {
-        System.out.printf("Skipped %s piece step", piece);
-        placePieceOpposite(piece.getOpposite());
-      }
-    } else {
+    Optional<Board> boardOptional = this.board.placePiece(coordinate, piece);
+    if (!boardOptional.isPresent()) {
       System.out.printf("You can not put %s on %s \n", piece, coordinate);
+      return;
+    }
+
+    this.board = boardOptional.get();
+
+    placePieceOpposite(piece.getOpposite());
+
+    while (this.board.getValidMoves(piece).isEmpty()) {
+      System.out.printf("Skipped %s piece step", piece);
+      placePieceOpposite(piece.getOpposite());
     }
   }
 
   private void placePieceOpposite(Piece piece) {
     List<Board> validChildes = new ArrayList<>();
 
-    validChildes.addAll(this.boardDelegate.getValidChildBoard(piece));
+    validChildes.addAll(this.board.getChildBoards(piece));
 
-    if (!validChildes.isEmpty()) {
-      this.boardDelegate = validChildes.get(0);
-    } else {
+    if (validChildes.isEmpty()) {
       System.out.printf("Skipped %s piece step", piece);
+      return;
     }
+
+    this.board = validChildes.get(0);
   }
 
   public boolean isFinished() {
-    return this.boardDelegate.isEnd();
+    return this.board.isEnd();
   }
 
   public String getBoardLayout() {
-    return this.boardDelegate.getBoardLayout();
+    return this.board.toString();
   }
 
   public void loadGame(String filePath) {
@@ -97,10 +98,16 @@ public class GameEngine {
       boardCells.add(rowCells);
     }
 
-    boardDelegate = Board.newInstance(boardCells);
+    Board newBoard = Board.newInstance(boardCells);
+    if (!newBoard.isValid()) {
+      System.err.println("The given board file is not valid");
+      return;
+    }
+
+    this.board = newBoard;
   }
 
-  public String getFile(String fileName) {
+  private String getFile(String fileName) {
 
     StringBuilder result = new StringBuilder("");
 
