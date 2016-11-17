@@ -23,41 +23,48 @@ public class GameEngine {
   }
 
   public void placePiece(Coordinate coordinate, Piece piece) {
-    checkState(boardDelegate != null);
+    checkState(this.boardDelegate != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    Optional<Board> boardOptional = boardDelegate.placePiece(coordinate, piece);
-    if (boardOptional.isPresent()) {
-      boardDelegate = boardOptional.get();
-      List<Board> validChildes = new ArrayList<>();
-      switch (piece) {
-        case BLACK:
-          validChildes.addAll(boardDelegate.getValidChildBoard(Piece.WHITE));
-          break;
-        case WHITE:
-          validChildes.addAll(boardDelegate.getValidChildBoard(Piece.BLACK));
-          break;
-        default:
-          throw new IllegalStateException(String.format("Cannot parse %s piece", piece));
-      }
+    if (!this.boardDelegate.isWithinBoard(coordinate)) {
+      System.out.printf("%s is not within the board\n", coordinate);
+      return;
+    }
 
-      if (!validChildes.isEmpty()) {
-        boardDelegate = validChildes.get(0);
-      } else {
+    Optional<Board> boardOptional = this.boardDelegate.placePiece(coordinate, piece);
+    if (boardOptional.isPresent()) {
+      this.boardDelegate = boardOptional.get();
+
+      placePieceOpposite(piece.getOpposite());
+
+      while (this.boardDelegate.getValidChildBoard(piece).isEmpty()) {
         System.out.printf("Skipped %s piece step", piece);
+        placePieceOpposite(piece.getOpposite());
       }
     } else {
       System.out.printf("You can not put %s on %s \n", piece, coordinate);
     }
   }
 
+  private void placePieceOpposite(Piece piece) {
+    List<Board> validChildes = new ArrayList<>();
+
+    validChildes.addAll(this.boardDelegate.getValidChildBoard(piece));
+
+    if (!validChildes.isEmpty()) {
+      this.boardDelegate = validChildes.get(0);
+    } else {
+      System.out.printf("Skipped %s piece step", piece);
+    }
+  }
+
   public boolean isFinished() {
-    return boardDelegate.isEnd();
+    return this.boardDelegate.isEnd();
   }
 
   public String getBoardLayout() {
-    return boardDelegate.getBoardLayout();
+    return this.boardDelegate.getBoardLayout();
   }
 
   public void loadGame(String filePath) {
