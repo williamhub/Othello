@@ -8,7 +8,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 public class Board {
-  public final static int DIMENSION = 8;
+  final static int DIMENSION = 8;
 
   private final static List<Coordinate> DIRECTIONS = new ArrayList<>();
 
@@ -136,7 +136,7 @@ public class Board {
   }
 
   public GameResult getWinner() {
-    if (!isEnd()) {
+    if (!isOver()) {
       throw new IllegalStateException("The game is end yet");
     }
 
@@ -173,7 +173,7 @@ public class Board {
         || coordinate.col > DIMENSION - 1);
   }
 
-  public boolean isEnd() {
+  public boolean isOver() {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
@@ -191,13 +191,32 @@ public class Board {
       return false;
     }
 
-    for (int row = 0; row < this.board.size(); row++) {
-      if (this.board.get(row).size() != DIMENSION) {
+    for (List<Cell> row : this.board) {
+      if (row.size() != DIMENSION) {
         return false;
       }
     }
 
     return true;
+  }
+
+  public int countPieces(Piece piece) {
+    int result = 0;
+
+    for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        Optional<Piece> optional = this.board.get(row).get(col).getPiece();
+        if (!optional.isPresent()) {
+          continue;
+        }
+
+        if (optional.get() == piece) {
+          result++;
+        }
+      }
+    }
+
+    return result;
   }
 
   public String toString() {
@@ -306,7 +325,7 @@ public class Board {
     checkArgument(start.getPiece().isPresent(), "start cell piece must be set");
     checkArgument(end.getPiece().isPresent(), "end cell piece must be set");
     checkArgument(start.getPiece().get() == end.getPiece().get(),
-        "start and end cell piece is not equal");
+        "start and end cell piece color is not equal");
 
     Cell currentCell = start;
     while (currentCell != end) {
@@ -322,24 +341,5 @@ public class Board {
                 start.getCoordinate(), end.getCoordinate(), direction));
       }
     }
-  }
-
-  private int countPieces(Piece piece) {
-    int result = 0;
-
-    for (int row = 0; row < DIMENSION; row++) {
-      for (int col = 0; col < DIMENSION; col++) {
-        Optional<Piece> optional = this.board.get(row).get(col).getPiece();
-        if (!optional.isPresent()) {
-          continue;
-        }
-
-        if (optional.get() == piece) {
-          result++;
-        }
-      }
-    }
-
-    return result;
   }
 }
