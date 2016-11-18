@@ -10,6 +10,7 @@ import model.Board;
 import model.Cell;
 import model.Coordinate;
 import model.Piece;
+import strategy.Strategy;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -17,11 +18,14 @@ import static com.google.common.base.Preconditions.checkState;
 public class GameEngine {
   Board board;
 
-  public GameEngine() {
+  Strategy strategy;
+
+  public GameEngine(Strategy strategy) {
     this.board = Board.newInstance();
+    this.strategy = strategy;
   }
 
-  public void placePiece(Coordinate coordinate, Piece piece) {
+  public void placePieceByHuman(Coordinate coordinate, Piece piece) {
     checkState(this.board != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
@@ -39,15 +43,19 @@ public class GameEngine {
 
     this.board = boardOptional.get();
 
-    placePieceOpposite(piece.getOpposite());
+    placePiece(piece.getOpposite());
 
     while (this.board.getValidMoves(piece).isEmpty()) {
       System.out.printf("Skipped %s piece step", piece);
-      placePieceOpposite(piece.getOpposite());
+      placePiece(piece.getOpposite());
     }
   }
 
-  private void placePieceOpposite(Piece piece) {
+  public void placePieceByRobot(Piece piece) {
+    placePiece(piece);
+  }
+
+  private void placePiece(Piece piece) {
     List<Board> validChildes = new ArrayList<>();
 
     validChildes.addAll(this.board.getChildBoards(piece));
@@ -57,11 +65,11 @@ public class GameEngine {
       return;
     }
 
-    this.board = validChildes.get(0);
+    this.board = this.strategy.choose(piece, validChildes);
   }
 
   public boolean isFinished() {
-    return this.board.isEnd();
+    return this.board.isOver();
   }
 
   public String getBoardLayout() {

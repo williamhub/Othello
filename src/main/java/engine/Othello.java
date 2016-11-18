@@ -3,11 +3,12 @@ package engine;
 import java.util.Scanner;
 import model.Coordinate;
 import model.Piece;
+import strategy.GreedyStrategy;
 
 public class Othello {
 
   public static void main(String[] args) {
-    GameEngine gameEngine = new GameEngine();
+    GameEngine gameEngine = new GameEngine(new GreedyStrategy());
     System.out.println(gameEngine.getBoardLayout());
 
     Scanner scanner = new Scanner(System.in);
@@ -18,7 +19,7 @@ public class Othello {
       int row = lineScanner.nextInt();
       int col = lineScanner.nextInt();
 
-      gameEngine.placePiece(new Coordinate(row, col), Piece.BLACK);
+      gameEngine.placePieceByHuman(new Coordinate(row, col), Piece.BLACK);
       System.out.println(gameEngine.getBoardLayout());
     }
   }

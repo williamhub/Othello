@@ -2,6 +2,7 @@ package engine;
 
 import org.junit.Before;
 import org.junit.Test;
+import strategy.GreedyStrategy;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,7 +12,7 @@ public class GameEngineTest {
 
   @Before
   public void prepareGameEngine() {
-    gameEngine = new GameEngine();
+    gameEngine = new GameEngine(new GreedyStrategy());
   }
 
   @Test
@@ -31,5 +32,4 @@ public class GameEngineTest {
 
     assertEquals(expected, actual);
   }
-
 }
