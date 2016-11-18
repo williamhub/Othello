@@ -1,5 +1,7 @@
 package engine;
 
+import model.Coordinate;
+import model.Piece;
 import org.junit.Before;
 import org.junit.Test;
 import strategy.GreedyStrategy;
@@ -27,6 +29,26 @@ public class GameEngineTest {
         + "00000000\n"
         + "00000000\n"
         + "00000000\n";
+
+    String actual = gameEngine.getBoardLayout();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test public void testPlacePieceByHuman() {
+    gameEngine.loadGame("engine/skip_black_piece_board.txt");
+
+    String expected =
+        "00BBBBB0\n"
+            + "00BBBB0B\n"
+            + "BBBBBBBB\n"
+            + "BBBBBBWB\n"
+            + "BBBWBBWB\n"
+            + "BBWBWWBB\n"
+            + "BWWWWW0B\n"
+            + "0BBBBBBB\n";
+
+    gameEngine.placePieceByHuman(new Coordinate(6, 7), Piece.BLACK);
 
     String actual = gameEngine.getBoardLayout();
 
