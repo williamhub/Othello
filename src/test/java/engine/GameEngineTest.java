@@ -35,7 +35,7 @@ public class GameEngineTest {
     assertEquals(expected, actual);
   }
 
-  @Test public void testPlacePieceByHuman() {
+  @Test public void testPlacePieceByHumanSkipBlack() {
     gameEngine.loadGame("engine/skip_black_piece_board.txt");
 
     String expected =
@@ -52,6 +52,62 @@ public class GameEngineTest {
 
     String actual = gameEngine.getBoardLayout();
 
+    assertEquals(expected, actual);
+  }
+
+  @Test public void testPlacePieceByHumanSkipWhite() {
+    gameEngine.loadGame("engine/skip_white_piece_board.txt");
+
+    String expected =
+        "WWWWW000\n"
+            + "WWWW0000\n"
+            + "WWWWWWW0\n"
+            + "BBBBBB00\n"
+            + "WWWWWWWW\n"
+            + "WWWWWWW0\n"
+            + "WWWWWW00\n"
+            + "WWWWWW00\n";
+
+    gameEngine.placePieceByHuman(new Coordinate(3, 5), Piece.BLACK);
+
+    String actual = gameEngine.getBoardLayout();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test public void testPlacePieceByHumanInvalid() {
+    gameEngine.loadGame("engine/sample_board.txt");
+    gameEngine.placePieceByHuman(new Coordinate(9, 9), Piece.BLACK);
+
+    String expected =
+        "00000000\n"
+            + "0WB00000\n"
+            + "00WB0000\n"
+            + "000BWB00\n"
+            + "0000BW00\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n";
+
+    String actual = gameEngine.getBoardLayout();
+    assertEquals(expected, actual);
+  }
+
+  @Test public void testPlacePieceByRobotInvalid() {
+    gameEngine.loadGame("engine/skip_white_piece_board.txt");
+    gameEngine.placePieceByRobot(Piece.WHITE);
+
+    String expected =
+        "WWWWW000\n"
+            + "WWWW0000\n"
+            + "WWWWWWW0\n"
+            + "BWWWW000\n"
+            + "WWWWWWWW\n"
+            + "WWWWWWW0\n"
+            + "WWWWWW00\n"
+            + "WWWWWW00\n";
+
+    String actual = gameEngine.getBoardLayout();
     assertEquals(expected, actual);
   }
 }

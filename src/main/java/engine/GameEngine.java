@@ -46,7 +46,7 @@ public class GameEngine {
     placePiece(piece.getOpposite());
 
     while (this.board.getValidMoves(piece).isEmpty()) {
-      System.out.printf("Skipped %s piece step", piece);
+      System.out.printf("Skipped %s piece step\n", piece);
       placePiece(piece.getOpposite());
     }
   }
@@ -61,7 +61,7 @@ public class GameEngine {
     validChildes.addAll(this.board.getChildBoards(piece));
 
     if (validChildes.isEmpty()) {
-      System.out.printf("Skipped %s piece step", piece);
+      System.out.printf("Skipped %s piece step\n", piece);
       return;
     }
 
