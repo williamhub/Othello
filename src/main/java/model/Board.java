@@ -124,10 +124,8 @@ public class Board {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        if (!this.board.get(row).get(col).getPiece().isPresent()) {
-          if (checkOrValidate(coordinate, piece, true)) {
-            coordinates.add(coordinate);
-          }
+        if (isValidMove(coordinate, piece)) {
+          coordinates.add(coordinate);
         }
       }
     }
@@ -156,10 +154,9 @@ public class Board {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    if (checkOrValidate(coordinate, piece, true)) {
+    if (isValidMove(coordinate, piece)) {
       Board newBoard = newInstance(this.board);
-      newBoard.setBoardCell(coordinate, piece);
-      newBoard.checkOrValidate(coordinate, piece, false);
+      newBoard.placeAndFlip(coordinate, piece);
       return Optional.of(newBoard);
     }
 
@@ -177,8 +174,8 @@ public class Board {
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
         Coordinate coordinate = new Coordinate(row, col);
-        if (checkOrValidate(coordinate, Piece.WHITE, true) || checkOrValidate(coordinate,
-            Piece.BLACK, true)) {
+        if (isValidMove(coordinate, Piece.WHITE) || isValidMove(coordinate,
+            Piece.BLACK)) {
           return false;
         }
       }
@@ -205,7 +202,7 @@ public class Board {
 
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
-        Optional<Piece> optional = this.board.get(row).get(col).getPiece();
+        Optional<Piece> optional = getBoardCell(new Coordinate(row, col)).get().getPiece();
         if (!optional.isPresent()) {
           continue;
         }
@@ -223,7 +220,7 @@ public class Board {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
-        builder.append(this.board.get(row).get(col).toString());
+        builder.append(getBoardCell(new Coordinate(row, col)).get().toString());
       }
       builder.append("\n");
     }
@@ -235,6 +232,10 @@ public class Board {
    * Board Helper Methods.
    */
 
+  private boolean isEmptyCell(Coordinate coordinate) {
+    return !getBoardCell(coordinate).get().getPiece().isPresent();
+  }
+
   private Optional<Cell> getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
 
@@ -243,28 +244,36 @@ public class Board {
         : Optional.<Cell>absent();
   }
 
-  private Cell setBoardCell(Coordinate coordinate, Piece piece) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-    checkArgument(piece != null, "Piece must be set");
-
+  private boolean isValidMove(Coordinate coordinate, Piece piece) {
     if (!isContain(coordinate)) {
-      throw new IllegalArgumentException(String.format("%s is not valid coordiate", coordinate));
+      throw new IllegalArgumentException(String.format("%s is not valid coordinate", coordinate));
     }
 
-    this.board.get(coordinate.row).get(coordinate.col).setPiece(piece);
+    if (!isEmptyCell(coordinate)) {
+      return false;
+    }
 
-    return this.board.get(coordinate.row).get(coordinate.col);
+    return checkOrFlip(coordinate, piece, true);
   }
 
-  /**
-   * Check or validate board from a target cell.
-   *
-   * @param isToValidate true if only check board, otherwise update board by all lines cross the
-   * given coordinate
-   */
-  private boolean checkOrValidate(Coordinate coordinate,
+  private boolean placeAndFlip(Coordinate coordinate, Piece piece) {
+    if (!isContain(coordinate)) {
+      throw new IllegalArgumentException(String.format("%s is not valid coordinate", coordinate));
+    }
+
+    getBoardCell(coordinate).get().setPiece(piece);
+
+    if (isEmptyCell(coordinate)) {
+      throw new IllegalArgumentException(
+          String.format("%s is empty, and cannot placeAndFlip board from here.", coordinate));
+    }
+
+    return checkOrFlip(coordinate, piece, false);
+  }
+
+  private boolean checkOrFlip(Coordinate coordinate,
       Piece piece,
-      boolean isToValidate) {
+      boolean isToCheck) {
     checkState(this.board != null);
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
@@ -275,48 +284,44 @@ public class Board {
       if (!optionalCell.isPresent()) {
         continue;
       }
-      Cell neighbourCell = optionalCell.get();
-
-      if (!neighbourCell.getPiece().isPresent()) {
+      Cell currentCell = optionalCell.get();
+      if (!currentCell.getPiece().isPresent()) {
         continue;
       }
-
-      Piece neighbourPiece = neighbourCell.getPiece().get();
-      if (neighbourPiece == piece) {
+      if (currentCell.getPiece().get() == piece) {
         continue;
       }
 
       while (true) {
-        Coordinate nextNeighbourCoordinate = neighbourCell.getCoordinate().move(direction);
-        optionalCell = getBoardCell(nextNeighbourCoordinate);
+        Coordinate endCoordinate = currentCell.getCoordinate().move(direction);
+        optionalCell = getBoardCell(endCoordinate);
         if (!optionalCell.isPresent()) {
           break;
         }
 
-        Cell nextNeighbourCell = optionalCell.get();
-        if (!nextNeighbourCell.getPiece().isPresent()) {
+        Cell endCell = optionalCell.get();
+        if (!endCell.getPiece().isPresent()) {
           break;
         }
 
-        Piece nextNeighbourPiece = nextNeighbourCell.getPiece().get();
-        if (nextNeighbourPiece == piece) {
-          if (isToValidate) {
+        if (endCell.getPiece().get() == piece) {
+          if (isToCheck) {
             return true;
           } else {
-            Cell start = new Cell(piece, coordinate);
-            updateBoard(start, nextNeighbourCell, direction);
+            Cell startCell = new Cell(piece, coordinate);
+            flipLine(startCell, endCell, direction);
             break;
           }
         }
 
-        neighbourCell = nextNeighbourCell;
+        currentCell = endCell;
       }
     }
 
     return false;
   }
 
-  private void updateBoard(Cell start, Cell end,
+  private void flipLine(Cell start, Cell end,
       Coordinate direction) {
     checkState(this.board != null);
     checkArgument(start != null, "start Cell must be set");
