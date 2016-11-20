@@ -30,24 +30,27 @@ public class GameEngine {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    if (!this.board.isContain(coordinate)) {
-      System.out.printf("%s is not within the board\n", coordinate);
-      return;
-    }
-
     Optional<Board> boardOptional = this.board.placePiece(coordinate, piece);
     if (!boardOptional.isPresent()) {
-      System.out.printf("You can not put %s on %s \n", piece, coordinate);
+      return;
+    }
+    this.board = boardOptional.get();
+    if (isOver()) {
       return;
     }
 
-    this.board = boardOptional.get();
-
     placePiece(piece.getOpposite());
+    if (isOver()) {
+      return;
+    }
 
     while (this.board.getValidMoves(piece).isEmpty()) {
       System.out.printf("Skipped %s piece step\n", piece);
       placePiece(piece.getOpposite());
+
+      if (isOver()) {
+        return;
+      }
     }
   }
 
@@ -68,8 +71,12 @@ public class GameEngine {
     this.board = this.strategy.choose(piece, validChildes);
   }
 
-  public boolean isFinished() {
-    return this.board.isOver();
+  public boolean isOver() {
+    boolean isGameOver = this.board.isOver();
+    if (isGameOver) {
+      System.out.printf("The winner is [%s]\n", this.board.getWinner());
+    }
+    return isGameOver;
   }
 
   public String getBoardLayout() {

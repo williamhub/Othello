@@ -246,14 +246,11 @@ public class Board {
 
   private boolean isValidMove(Coordinate coordinate, Piece piece) {
     if (!isContain(coordinate)) {
-      throw new IllegalArgumentException(String.format("%s is not valid coordinate", coordinate));
-    }
-
-    if (!isEmptyCell(coordinate)) {
+      System.out.printf("%s is not valid coordinate", coordinate);
       return false;
     }
 
-    return checkOrFlip(coordinate, piece, true);
+    return isEmptyCell(coordinate) && checkOrFlip(coordinate, piece, true);
   }
 
   private boolean placeAndFlip(Coordinate coordinate, Piece piece) {

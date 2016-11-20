@@ -21,14 +21,15 @@ public class GameEngineTest {
   public void testLoadGame() {
     gameEngine.loadGame("engine/sample_board.txt");
 
-    String expected = "00000000\n"
-        + "0WB00000\n"
-        + "00WB0000\n"
-        + "000BWB00\n"
-        + "0000BW00\n"
-        + "00000000\n"
-        + "00000000\n"
-        + "00000000\n";
+    String expected =
+        "00000000\n"
+            + "0WB00000\n"
+            + "00WB0000\n"
+            + "000BWB00\n"
+            + "0000BW00\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n";
 
     String actual = gameEngine.getBoardLayout();
 
@@ -72,6 +73,24 @@ public class GameEngineTest {
 
     String actual = gameEngine.getBoardLayout();
 
+    assertEquals(expected, actual);
+  }
+
+  @Test public void testPlacePieceByHumanLastStep() {
+    gameEngine.loadGame("engine/last_step_board.txt");
+    gameEngine.placePieceByHuman(new Coordinate(7, 0), Piece.BLACK);
+
+    String expected =
+        "WWWWWWWW\n"
+            + "BWBBBBBB\n"
+            + "BWWBWBBB\n"
+            + "BWBWBWWB\n"
+            + "BWWBWWWB\n"
+            + "BWBWWWWB\n"
+            + "BWWWWWWB\n"
+            + "BWWWWWWB\n";
+
+    String actual = gameEngine.getBoardLayout();
     assertEquals(expected, actual);
   }
 
