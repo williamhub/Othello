@@ -3,6 +3,7 @@ package model;
 import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import utils.FileReaderUtil;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -44,6 +45,44 @@ public class Board {
     Board board = new Board();
     board.setBoard(cells);
     return board;
+  }
+
+  public static Board newInstance(String filePath) {
+    String rawBoard = FileReaderUtil.getFile(filePath);
+    String[] rawBoardRows = rawBoard.split("\n");
+
+    List<List<Cell>> boardCells = new ArrayList<>();
+
+    for (int row = 0; row < rawBoardRows.length; row++) {
+      String rawBoardRow = rawBoardRows[row];
+      List<Cell> rowCells = new ArrayList<>();
+      for (int col = 0; col < rawBoardRow.length(); col++) {
+        Coordinate coordinate = new Coordinate(row, col);
+        switch (rawBoardRow.charAt(col)) {
+          case '0':
+            rowCells.add(new Cell(coordinate));
+            break;
+          case 'B':
+            rowCells.add(new Cell(Piece.BLACK, coordinate));
+            break;
+          case 'W':
+            rowCells.add(new Cell(Piece.WHITE, coordinate));
+            break;
+          default:
+            throw new IllegalArgumentException(
+                String.format("Cannot parse %s input from file: %s", rawBoardRow.charAt(col),
+                    filePath));
+        }
+      }
+      boardCells.add(rowCells);
+    }
+
+    Board newBoard = Board.newInstance(boardCells);
+    if (!newBoard.isValid()) {
+      throw new IllegalArgumentException("The given board file is not valid");
+    }
+
+    return newBoard;
   }
 
   private void initializeBoard() {
@@ -228,20 +267,20 @@ public class Board {
     return builder.toString();
   }
 
+  public Optional<Cell> getBoardCell(Coordinate coordinate) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+
+    return isContain(coordinate) ? Optional.of(
+        this.board.get(coordinate.row).get(coordinate.col))
+        : Optional.<Cell>absent();
+  }
+
   /**
    * Board Helper Methods.
    */
 
   private boolean isEmptyCell(Coordinate coordinate) {
     return !getBoardCell(coordinate).get().getPiece().isPresent();
-  }
-
-  private Optional<Cell> getBoardCell(Coordinate coordinate) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-
-    return isContain(coordinate) ? Optional.of(
-        this.board.get(coordinate.row).get(coordinate.col))
-        : Optional.<Cell>absent();
   }
 
   private boolean isValidMove(Coordinate coordinate, Piece piece) {

@@ -1,24 +1,18 @@
 package model;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode {
-  private List<TreeNode> childs;
-  private TreeNode parent;
+  private List<TreeNode> childes;
   private Board board;
   private Piece currentPiece;
+  private int heuristicValue;
 
-  public TreeNode(TreeNode parent, Board board, Piece piece) {
-    this.parent = parent;
+  public TreeNode(Board board, Piece piece) {
     this.board = board;
     this.currentPiece = piece;
-    this.childs = new ArrayList<>();
-  }
-
-  public TreeNode getParent() {
-    return this.parent;
+    this.childes = new ArrayList<>();
   }
 
   public Board getBoard() {
@@ -29,13 +23,21 @@ public class TreeNode {
     return currentPiece;
   }
 
-  public List<TreeNode> getChilds() {
-    return Lists.newArrayList(childs);
+  public List<TreeNode> getChildes() {
+    return this.childes;
+  }
+
+  public int getHeuristicValue() {
+    return heuristicValue;
+  }
+
+  public void setHeuristicValue(int heuristicValue) {
+    this.heuristicValue = heuristicValue;
   }
 
   public TreeNode addChild(Board board) {
-    TreeNode treeNode = new TreeNode(this, board, currentPiece.getOpposite());
-    this.childs.add(treeNode);
+    TreeNode treeNode = new TreeNode(board, currentPiece.getOpposite());
+    this.childes.add(treeNode);
     return treeNode;
   }
 }

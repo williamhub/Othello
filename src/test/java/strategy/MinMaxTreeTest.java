@@ -5,26 +5,37 @@ import model.Board;
 import model.Piece;
 import model.TreeNode;
 import org.junit.Test;
+import strategy.heuristic.HeuristicMethod;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class MinMaxTreeTest {
 
-  @Test public void testMinMaxTree() {
+  @Test public void testConstructChildes() {
     Board rootBoard = Board.newInstance();
-    MinMaxTree minMaxTree = MinMaxTree.newInstance(rootBoard, Piece.BLACK);
+    MinMaxTree minMaxTree = MinMaxTree.newInstance(rootBoard, Piece.BLACK, null);
     TreeNode rootTreeNode = minMaxTree.getRoot();
 
-    List<TreeNode> rootChilds = rootTreeNode.getChilds();
-    List<TreeNode> levelOneChilds = rootTreeNode.getChilds().get(0).getChilds();
-    List<TreeNode> levelTwoChilds = rootTreeNode.getChilds().get(0).getChilds().get(0).getChilds();
-    List<TreeNode> levelThreeChilds =
-        rootTreeNode.getChilds().get(0).getChilds().get(0).getChilds().get(0).getChilds();
+    List<TreeNode> rootChildes = rootTreeNode.getChildes();
+    List<TreeNode> levelOneChildes = rootTreeNode.getChildes().get(0).getChildes();
+    List<TreeNode> levelTwoChildes =
+        rootTreeNode.getChildes().get(0).getChildes().get(0).getChildes();
+    List<TreeNode> levelThreeChildes =
+        rootTreeNode.getChildes().get(0).getChildes().get(0).getChildes().get(0).getChildes();
 
-    assertEquals(rootChilds.size(), 4);
-    assertEquals(levelOneChilds.size(), 3);
-    assertNotEquals(levelTwoChilds.size(), 0);
-    assertEquals(levelThreeChilds.size(), 0);
+    assertEquals(4, rootChildes.size());
+    assertEquals(3, levelOneChildes.size());
+    assertNotEquals(0, levelTwoChildes.size());
+    assertEquals(6, levelThreeChildes.size());
+  }
+
+  @Test public void testGetNextNode() {
+    Board rootBoard = Board.newInstance("strategy/stable_game_board.txt");
+    MinMaxTree minMaxTree = MinMaxTree.newInstance(rootBoard, Piece.WHITE, new HeuristicMethod());
+
+    TreeNode nextNode = minMaxTree.getNextNode();
+    System.out.println(nextNode.getBoard().toString());
+    // TODO: complete the test
   }
 }

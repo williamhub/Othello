@@ -102,4 +102,22 @@ public class BoardTest {
       assertEquals(expected[index], actual[index]);
     }
   }
+
+  @Test public void testLoadBoard() {
+    Board board = Board.newInstance("model/board_to_load.txt");
+
+    String expected =
+        "00000000\n"
+            + "0WB00000\n"
+            + "00WB0000\n"
+            + "000BWB00\n"
+            + "0000BW00\n"
+            + "00000000\n"
+            + "00000000\n"
+            + "00000000\n";
+
+    String actual = board.toString();
+
+    assertEquals(expected, actual);
+  }
 }
