@@ -1,16 +1,14 @@
 package engine;
 
 import com.google.common.base.Optional;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import model.Board;
 import model.Cell;
 import model.Coordinate;
 import model.Piece;
 import strategy.Strategy;
+import utils.FileReaderUtil;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -59,16 +57,12 @@ public class GameEngine {
   }
 
   private void placePiece(Piece piece) {
-    List<Board> validChildes = new ArrayList<>();
-
-    validChildes.addAll(this.board.getChildBoards(piece));
-
-    if (validChildes.isEmpty()) {
+    if (this.board.getChildBoards(piece).isEmpty()) {
       System.out.printf("Skipped %s piece step\n", piece);
       return;
     }
 
-    this.board = this.strategy.choose(piece, validChildes);
+    this.board = this.strategy.choose(piece, this.board);
   }
 
   public boolean isOver() {
@@ -84,7 +78,7 @@ public class GameEngine {
   }
 
   public void loadGame(String filePath) {
-    String gameState = getFile(filePath);
+    String gameState = FileReaderUtil.getFile(filePath);
     String[] gameStateRows = gameState.split("\n");
 
     List<List<Cell>> boardCells = new ArrayList<>();
@@ -105,7 +99,7 @@ public class GameEngine {
             rowCells.add(new Cell(Piece.WHITE, coordinate));
             break;
           default:
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                 String.format("Cannot parse %s input from file: %s", rowLine.charAt(col),
                     filePath));
         }
@@ -120,27 +114,5 @@ public class GameEngine {
     }
 
     this.board = newBoard;
-  }
-
-  private String getFile(String fileName) {
-
-    StringBuilder result = new StringBuilder("");
-
-    ClassLoader classLoader = getClass().getClassLoader();
-    File file = new File(classLoader.getResource(fileName).getFile());
-
-    try (Scanner scanner = new Scanner(file)) {
-
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        result.append(line).append("\n");
-      }
-
-      scanner.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return result.toString();
   }
 }

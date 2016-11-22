@@ -236,6 +236,12 @@ public class Board {
     return !getBoardCell(coordinate).get().getPiece().isPresent();
   }
 
+  public Optional<Cell> getBoardCell(int row, int col) {
+    return isContain(new Coordinate(row, col)) ? Optional.of(
+        this.board.get(row).get(col))
+        : Optional.<Cell>absent();
+  }
+
   private Optional<Cell> getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
 

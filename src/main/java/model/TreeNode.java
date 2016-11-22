@@ -10,6 +10,8 @@ public class TreeNode {
   private Board board;
   private Piece currentPiece;
 
+  private int heuristicValue;
+
   public TreeNode(TreeNode parent, Board board, Piece piece) {
     this.parent = parent;
     this.board = board;
@@ -37,5 +39,13 @@ public class TreeNode {
     TreeNode treeNode = new TreeNode(this, board, currentPiece.getOpposite());
     this.childs.add(treeNode);
     return treeNode;
+  }
+
+  public int getHeuristicValue() {
+    return heuristicValue;
+  }
+
+  public void setHeuristicValue(int heuristicValue) {
+    this.heuristicValue = heuristicValue;
   }
 }

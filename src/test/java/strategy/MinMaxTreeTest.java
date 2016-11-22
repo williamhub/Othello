@@ -5,6 +5,8 @@ import model.Board;
 import model.Piece;
 import model.TreeNode;
 import org.junit.Test;
+import strategy.minmaxtree.MinMaxTree;
+import strategy.minmaxtree.StableStrategyTree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -13,18 +15,18 @@ public class MinMaxTreeTest {
 
   @Test public void testMinMaxTree() {
     Board rootBoard = Board.newInstance();
-    MinMaxTree minMaxTree = MinMaxTree.newInstance(rootBoard, Piece.BLACK);
+    MinMaxTree minMaxTree = StableStrategyTree.newInstance(rootBoard, Piece.BLACK);
     TreeNode rootTreeNode = minMaxTree.getRoot();
 
-    List<TreeNode> rootChilds = rootTreeNode.getChilds();
-    List<TreeNode> levelOneChilds = rootTreeNode.getChilds().get(0).getChilds();
-    List<TreeNode> levelTwoChilds = rootTreeNode.getChilds().get(0).getChilds().get(0).getChilds();
-    List<TreeNode> levelThreeChilds =
+    List<TreeNode> rootChildes = rootTreeNode.getChilds();
+    List<TreeNode> levelOneChildes = rootTreeNode.getChilds().get(0).getChilds();
+    List<TreeNode> levelTwoChildes = rootTreeNode.getChilds().get(0).getChilds().get(0).getChilds();
+    List<TreeNode> levelThreeChildes =
         rootTreeNode.getChilds().get(0).getChilds().get(0).getChilds().get(0).getChilds();
 
-    assertEquals(rootChilds.size(), 4);
-    assertEquals(levelOneChilds.size(), 3);
-    assertNotEquals(levelTwoChilds.size(), 0);
-    assertEquals(levelThreeChilds.size(), 0);
+    assertEquals(rootChildes.size(), 4);
+    assertEquals(levelOneChildes.size(), 3);
+    assertNotEquals(levelTwoChildes.size(), 0);
+    assertEquals(levelThreeChildes.size(), 0);
   }
 }
