@@ -9,14 +9,8 @@ import static org.junit.Assert.assertEquals;
 
 public class GreedyStrategyTest {
 
-  GameEngine gameEngine;
-
-  @Before public void prepareGameEngine() {
-    gameEngine = new GameEngine(new GreedyStrategy());
-  }
-
   @Test public void testChoose() {
-    gameEngine.loadGame("strategy/greedy_game_board.txt");
+    GameEngine gameEngine = new GameEngine(new GreedyStrategy(), "strategy/greedy_game_board.txt");
 
     String expected =
         "00000000\n"

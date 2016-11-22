@@ -10,34 +10,9 @@ import static org.junit.Assert.assertEquals;
 
 public class GameEngineTest {
 
-  GameEngine gameEngine;
-
-  @Before
-  public void prepareGameEngine() {
-    gameEngine = new GameEngine(new GreedyStrategy());
-  }
-
-  @Test
-  public void testLoadGame() {
-    gameEngine.loadGame("engine/sample_board.txt");
-
-    String expected =
-        "00000000\n"
-            + "0WB00000\n"
-            + "00WB0000\n"
-            + "000BWB00\n"
-            + "0000BW00\n"
-            + "00000000\n"
-            + "00000000\n"
-            + "00000000\n";
-
-    String actual = gameEngine.getBoardLayout();
-
-    assertEquals(expected, actual);
-  }
-
   @Test public void testPlacePieceByHumanSkipBlack() {
-    gameEngine.loadGame("engine/skip_black_piece_board.txt");
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/skip_black_piece_board.txt");
 
     String expected =
         "00BBBBB0\n"
@@ -57,7 +32,8 @@ public class GameEngineTest {
   }
 
   @Test public void testPlacePieceByHumanSkipWhite() {
-    gameEngine.loadGame("engine/skip_white_piece_board.txt");
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/skip_white_piece_board.txt");
 
     String expected =
         "WWWWW000\n"
@@ -77,7 +53,8 @@ public class GameEngineTest {
   }
 
   @Test public void testPlacePieceByHumanLastStep() {
-    gameEngine.loadGame("engine/last_step_board.txt");
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/last_step_board.txt");
     gameEngine.placePieceByHuman(new Coordinate(7, 0), Piece.BLACK);
 
     String expected =
@@ -95,25 +72,27 @@ public class GameEngineTest {
   }
 
   @Test public void testPlacePieceByHumanInvalid() {
-    gameEngine.loadGame("engine/sample_board.txt");
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/last_step_board.txt");
     gameEngine.placePieceByHuman(new Coordinate(9, 9), Piece.BLACK);
 
     String expected =
-        "00000000\n"
-            + "0WB00000\n"
-            + "00WB0000\n"
-            + "000BWB00\n"
-            + "0000BW00\n"
-            + "00000000\n"
-            + "00000000\n"
-            + "00000000\n";
+        "WWWWWWWW\n"
+            + "BWBBBBBB\n"
+            + "WWWBWWBB\n"
+            + "WWBWWWWB\n"
+            + "WWWWWWWB\n"
+            + "WWWWWWWB\n"
+            + "WWWWWWWB\n"
+            + "00WWWWWB\n";
 
     String actual = gameEngine.getBoardLayout();
     assertEquals(expected, actual);
   }
 
   @Test public void testPlacePieceByRobotInvalid() {
-    gameEngine.loadGame("engine/skip_white_piece_board.txt");
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/skip_white_piece_board.txt");
     gameEngine.placePieceByRobot(Piece.WHITE);
 
     String expected =
