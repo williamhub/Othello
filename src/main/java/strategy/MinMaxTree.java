@@ -1,54 +1,25 @@
 package strategy;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import model.Board;
+import model.Coordinate;
 import model.Piece;
 import model.TreeNode;
 import strategy.heuristic.HeuristicMethod;
-
-import static com.google.common.base.Preconditions.checkState;
 
 public class MinMaxTree {
   public final static int LEVELS = 3;
 
   private TreeNode root;
 
+  private AlphaBeta alphaBeta;
+
   private HeuristicMethod heuristicMethod;
 
-  public static MinMaxTree newInstance(Board board, Piece piece, HeuristicMethod heuristicMethod) {
-    TreeNode treeNode = new TreeNode(board, piece);
-    MinMaxTree minMaxTree = new MinMaxTree();
-    minMaxTree.root = treeNode;
-    minMaxTree.heuristicMethod = heuristicMethod;
-
-    minMaxTree.initialize();
-
-    return minMaxTree;
-  }
-
-  private MinMaxTree() {
-    // prevent initialization
-  }
-
-  private void initialize() {
-    checkState(this.root != null);
-
-    constructChildes(this.root, LEVELS + 1);
-  }
-
-  private void constructChildes(TreeNode root, int restLevels) {
-    if (restLevels == 0) {
-      return;
-    }
-
-    List<Board> childBoards = root.getBoard().getChildBoards(root.getCurrentPiece());
-
-    for (Board childBoard : childBoards) {
-      TreeNode childTreeNode = root.addChild(childBoard);
-      constructChildes(childTreeNode, restLevels - 1);
-    }
+  public MinMaxTree(Board board, Piece piece, HeuristicMethod heuristicMethod) {
+    this.root = new TreeNode(board, piece);
+    this.heuristicMethod = heuristicMethod;
+    this.alphaBeta = new AlphaBeta(Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
 
   public TreeNode getRoot() {
@@ -56,61 +27,82 @@ public class MinMaxTree {
   }
 
   public TreeNode getNextNode() {
-    return getNextNode(this.root, LEVELS);
+    getNextNode(getRoot(), LEVELS + 1);
+    return getRoot().getChosenChild();
   }
 
-  private TreeNode getNextNode(TreeNode parent, final int restLevels) {
+  private int getNextNode(TreeNode parent, final int restLevels) {
     if (restLevels == 0) {
-      return getOptimalChild(parent);
+      return heuristicMethod.getResult(parent);
     }
 
-    TreeNode child = getOptimalChild(parent, restLevels);
-    parent.setHeuristicValue(child.getHeuristicValue());
-
-    return child;
-  }
-
-  private TreeNode getOptimalChild(TreeNode parent, final int restLevels) {
+    List<Coordinate> childes = parent.getValidBoardMoves();
     switch (parent.getCurrentPiece()) {
       case BLACK:
-        return Collections.max(parent.getChildes(), new Comparator<TreeNode>() {
-          @Override public int compare(TreeNode treeNode1, TreeNode treeNode2) {
-            return getNextNode(treeNode1, restLevels - 1).getHeuristicValue() - getNextNode(
-                treeNode2,
-                restLevels - 1).getHeuristicValue();
+        TreeNode maxChild = null;
+
+        for (Coordinate coordinate : childes) {
+          TreeNode childNode = parent.getValidChild(coordinate);
+          int heuristicScore = getNextNode(childNode, restLevels - 1);
+
+          if (maxChild == null) {
+            maxChild = childNode;
+          } else {
+            if (maxChild.getHeuristicScore() < childNode.getHeuristicScore()) {
+              maxChild = childNode;
+            }
           }
-        });
+
+          if (heuristicScore > alphaBeta.alpha) {
+            alphaBeta.alpha = heuristicScore;
+          }
+          if (alphaBeta.alpha >= alphaBeta.beta) {
+            // beta cut-off
+            break;
+          }
+        }
+
+        parent.setChosenChild(maxChild);
+        return alphaBeta.alpha;
       case WHITE:
-        return Collections.min(parent.getChildes(), new Comparator<TreeNode>() {
-          @Override public int compare(TreeNode treeNode1, TreeNode treeNode2) {
-            return getNextNode(treeNode1, restLevels - 1).getHeuristicValue() - getNextNode(
-                treeNode2,
-                restLevels - 1).getHeuristicValue();
+        TreeNode minChild = null;
+
+        for (Coordinate coordinate : childes) {
+          TreeNode childNode = parent.getValidChild(coordinate);
+          int heuristicScore = getNextNode(childNode, restLevels - 1);
+
+          if (minChild == null) {
+            minChild = childNode;
+          } else {
+            if (minChild.getHeuristicScore() > childNode.getHeuristicScore()) {
+              minChild = childNode;
+            }
           }
-        });
+
+          if (heuristicScore < alphaBeta.beta) {
+            alphaBeta.beta = heuristicScore;
+          }
+          if (alphaBeta.alpha >= alphaBeta.beta) {
+            // alpha cut-off
+            break;
+          }
+        }
+
+        parent.setChosenChild(minChild);
+        return alphaBeta.beta;
       default:
         throw new IllegalArgumentException(
             String.format("Cannot use [%s] piece", parent.getCurrentPiece()));
     }
   }
 
-  private TreeNode getOptimalChild(TreeNode parent) {
-    switch (parent.getCurrentPiece()) {
-      case BLACK:
-        return Collections.max(parent.getChildes(), new Comparator<TreeNode>() {
-          @Override public int compare(TreeNode treeNode1, TreeNode treeNode2) {
-            return heuristicMethod.getResult(treeNode1) - heuristicMethod.getResult(treeNode2);
-          }
-        });
-      case WHITE:
-        return Collections.min(parent.getChildes(), new Comparator<TreeNode>() {
-          @Override public int compare(TreeNode treeNode1, TreeNode treeNode2) {
-            return heuristicMethod.getResult(treeNode1) - heuristicMethod.getResult(treeNode2);
-          }
-        });
-      default:
-        throw new IllegalArgumentException(
-            String.format("Cannot use [%s] piece", parent.getCurrentPiece()));
+  private class AlphaBeta {
+    public int alpha;
+    public int beta;
+
+    public AlphaBeta(int alpha, int beta) {
+      this.alpha = alpha;
+      this.beta = beta;
     }
   }
 }

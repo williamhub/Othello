@@ -16,7 +16,7 @@ public class HeuristicMethodTest {
     HeuristicMethod heuristicMethod = new HeuristicMethod();
     int actual = heuristicMethod.getResult(treeNode);
 
-    int expected = 7;
+    int expected = 6;
 
     assertEquals(expected, actual);
   }
