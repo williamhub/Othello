@@ -1,8 +1,5 @@
 package engine;
 
-import com.google.common.base.Optional;
-import java.util.ArrayList;
-import java.util.List;
 import model.Board;
 import model.Coordinate;
 import model.Piece;
@@ -31,11 +28,7 @@ public class GameEngine {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    Optional<Board> boardOptional = this.board.placePiece(coordinate, piece);
-    if (!boardOptional.isPresent()) {
-      return;
-    }
-    this.board = boardOptional.get();
+    this.board = this.board.placePiece(coordinate, piece);
     if (isOver()) {
       return;
     }
@@ -60,16 +53,7 @@ public class GameEngine {
   }
 
   private void placePiece(Piece piece) {
-    List<Board> validChildes = new ArrayList<>();
-
-    validChildes.addAll(this.board.getChildBoards(piece));
-
-    if (validChildes.isEmpty()) {
-      System.out.printf("Skipped %s piece step\n", piece);
-      return;
-    }
-
-    this.board = this.strategy.choose(piece, validChildes);
+    this.board = this.strategy.choose(piece, this.board);
   }
 
   public boolean isOver() {

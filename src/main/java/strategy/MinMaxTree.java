@@ -92,7 +92,7 @@ public class MinMaxTree {
         return alphaBeta.beta;
       default:
         throw new IllegalArgumentException(
-            String.format("Cannot use [%s] piece", parent.getCurrentPiece()));
+            String.format("Unknown piece [%s]", parent.getCurrentPiece()));
     }
   }
 

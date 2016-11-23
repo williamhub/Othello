@@ -22,7 +22,7 @@ public class TreeNode {
   }
 
   public TreeNode getValidChild(Coordinate coordinate) {
-    return new TreeNode(this.board.placePiece(coordinate, currentPiece).get(),
+    return new TreeNode(this.board.placePiece(coordinate, currentPiece),
         currentPiece.getOpposite());
   }
 

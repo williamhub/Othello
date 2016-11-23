@@ -5,6 +5,7 @@ import model.Piece;
 import model.TreeNode;
 import org.junit.Test;
 import strategy.heuristic.HeuristicMethod;
+import strategy.heuristic.StableMethod;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,7 +14,7 @@ public class HeuristicMethodTest {
     Board board = Board.newInstance("strategy/stable_game_board.txt");
     TreeNode treeNode = new TreeNode(board, Piece.BLACK);
 
-    HeuristicMethod heuristicMethod = new HeuristicMethod();
+    HeuristicMethod heuristicMethod = new StableMethod();
     int actual = heuristicMethod.getResult(treeNode);
 
     int expected = 6;
