@@ -21,7 +21,7 @@ public enum Piece {
       case "W":
         return BLACK;
       default:
-        throw new IllegalStateException(String.format("Cannot parse %s piece", text));
+        throw new IllegalStateException(String.format("Unknown piece [%s]", text));
     }
   }
 }

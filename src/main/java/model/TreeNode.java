@@ -1,43 +1,48 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode {
-  private List<TreeNode> childes;
   private Board board;
   private Piece currentPiece;
-  private int heuristicValue;
+  private int heuristicScore;
+  private TreeNode chosenChild;
 
   public TreeNode(Board board, Piece piece) {
     this.board = board;
     this.currentPiece = piece;
-    this.childes = new ArrayList<>();
   }
 
   public Board getBoard() {
     return this.board;
   }
 
+  public List<Coordinate> getValidBoardMoves() {
+    return this.board.getValidMoves(currentPiece);
+  }
+
+  public TreeNode getValidChild(Coordinate coordinate) {
+    return new TreeNode(this.board.placePiece(coordinate, currentPiece),
+        currentPiece.getOpposite());
+  }
+
   public Piece getCurrentPiece() {
     return currentPiece;
   }
 
-  public List<TreeNode> getChildes() {
-    return this.childes;
+  public TreeNode getChosenChild() {
+    return chosenChild;
   }
 
-  public int getHeuristicValue() {
-    return heuristicValue;
+  public void setChosenChild(TreeNode chosenChild) {
+    this.chosenChild = chosenChild;
   }
 
-  public void setHeuristicValue(int heuristicValue) {
-    this.heuristicValue = heuristicValue;
+  public int getHeuristicScore() {
+    return heuristicScore;
   }
 
-  public TreeNode addChild(Board board) {
-    TreeNode treeNode = new TreeNode(board, currentPiece.getOpposite());
-    this.childes.add(treeNode);
-    return treeNode;
+  public void setHeuristicScore(int heuristicScore) {
+    this.heuristicScore = heuristicScore;
   }
 }

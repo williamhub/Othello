@@ -2,7 +2,6 @@ package engine;
 
 import model.Coordinate;
 import model.Piece;
-import org.junit.Before;
 import org.junit.Test;
 import strategy.GreedyStrategy;
 
@@ -71,41 +70,4 @@ public class GameEngineTest {
     assertEquals(expected, actual);
   }
 
-  @Test public void testPlacePieceByHumanInvalid() {
-    GameEngine gameEngine =
-        new GameEngine(new GreedyStrategy(), "engine/last_step_board.txt");
-    gameEngine.placePieceByHuman(new Coordinate(9, 9), Piece.BLACK);
-
-    String expected =
-        "WWWWWWWW\n"
-            + "BWBBBBBB\n"
-            + "WWWBWWBB\n"
-            + "WWBWWWWB\n"
-            + "WWWWWWWB\n"
-            + "WWWWWWWB\n"
-            + "WWWWWWWB\n"
-            + "00WWWWWB\n";
-
-    String actual = gameEngine.getBoardLayout();
-    assertEquals(expected, actual);
-  }
-
-  @Test public void testPlacePieceByRobotInvalid() {
-    GameEngine gameEngine =
-        new GameEngine(new GreedyStrategy(), "engine/skip_white_piece_board.txt");
-    gameEngine.placePieceByRobot(Piece.WHITE);
-
-    String expected =
-        "WWWWW000\n"
-            + "WWWW0000\n"
-            + "WWWWWWW0\n"
-            + "BWWWW000\n"
-            + "WWWWWWWW\n"
-            + "WWWWWWW0\n"
-            + "WWWWWW00\n"
-            + "WWWWWW00\n";
-
-    String actual = gameEngine.getBoardLayout();
-    assertEquals(expected, actual);
-  }
 }

@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 public class Board {
-  final static int DIMENSION = 8;
+  private final static int DIMENSION = 8;
 
   private final static List<Coordinate> DIRECTIONS = new ArrayList<>();
 
@@ -41,12 +41,6 @@ public class Board {
     return board;
   }
 
-  public static Board newInstance(List<List<Cell>> cells) {
-    Board board = new Board();
-    board.setBoard(cells);
-    return board;
-  }
-
   public static Board newInstance(String filePath) {
     String rawBoard = FileReaderUtil.getFile(filePath);
     String[] rawBoardRows = rawBoard.split("\n");
@@ -70,7 +64,7 @@ public class Board {
             break;
           default:
             throw new IllegalArgumentException(
-                String.format("Cannot parse %s input from file: %s", rawBoardRow.charAt(col),
+                String.format("Unknown char [%s] in file: %s", rawBoardRow.charAt(col),
                     filePath));
         }
       }
@@ -83,6 +77,12 @@ public class Board {
     }
 
     return newBoard;
+  }
+
+  private static Board newInstance(List<List<Cell>> cells) {
+    Board board = new Board();
+    board.setBoard(cells);
+    return board;
   }
 
   private void initializeBoard() {
@@ -148,10 +148,7 @@ public class Board {
 
     List<Coordinate> potentialMoves = getValidMoves(piece);
     for (Coordinate potentialMove : potentialMoves) {
-      Optional<Board> optional = placePiece(potentialMove, piece);
-      if (optional.isPresent()) {
-        childBoards.add(optional.get());
-      }
+      childBoards.add(placePiece(potentialMove, piece));
     }
 
     return childBoards;
@@ -174,7 +171,7 @@ public class Board {
 
   public GameResult getWinner() {
     if (!isOver()) {
-      throw new IllegalStateException("The game is end yet");
+      throw new IllegalStateException("The game is not end yet");
     }
 
     int whiteCount = countPieces(Piece.WHITE);
@@ -189,24 +186,13 @@ public class Board {
     }
   }
 
-  public Optional<Board> placePiece(Coordinate coordinate, Piece piece) {
+  public Board placePiece(Coordinate coordinate, Piece piece) {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
-    if (isValidMove(coordinate, piece)) {
-      Board newBoard = newInstance(this.board);
-      newBoard.placeAndFlip(coordinate, piece);
-      return Optional.of(newBoard);
-    }
-
-    return Optional.absent();
-  }
-
-  public boolean isContain(Coordinate coordinate) {
-    return !(coordinate.row < 0
-        || coordinate.row > DIMENSION - 1
-        || coordinate.col < 0
-        || coordinate.col > DIMENSION - 1);
+    Board newBoard = newInstance(this.board);
+    newBoard.placeAndFlip(coordinate, piece);
+    return newBoard;
   }
 
   public boolean isOver() {
@@ -222,26 +208,12 @@ public class Board {
     return true;
   }
 
-  public boolean isValid() {
-    if (this.board.size() != DIMENSION) {
-      return false;
-    }
-
-    for (List<Cell> row : this.board) {
-      if (row.size() != DIMENSION) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   public int countPieces(Piece piece) {
     int result = 0;
 
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
-        Optional<Piece> optional = getBoardCell(new Coordinate(row, col)).get().getPiece();
+        Optional<Piece> optional = getBoardCell(row, col).getPiece();
         if (!optional.isPresent()) {
           continue;
         }
@@ -255,11 +227,27 @@ public class Board {
     return result;
   }
 
+  public Cell getBoardCell(Coordinate coordinate) {
+    checkArgument(coordinate != null, "Coordinate must be set");
+
+    if (!isContain(coordinate)) {
+      throw new IllegalArgumentException(String.format("Invalid coordinate [%s]", coordinate));
+    }
+    return this.board.get(coordinate.row).get(coordinate.col);
+  }
+
+  public Cell getBoardCell(int row, int col) {
+    if (!isContain(row, col)) {
+      throw new IllegalArgumentException(String.format("Invalid coordinate [%s, %s]", row, col));
+    }
+    return this.board.get(row).get(col);
+  }
+
   public String toString() {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < DIMENSION; row++) {
       for (int col = 0; col < DIMENSION; col++) {
-        builder.append(getBoardCell(new Coordinate(row, col)).get().toString());
+        builder.append(getBoardCell(row, col).toString());
       }
       builder.append("\n");
     }
@@ -267,42 +255,56 @@ public class Board {
     return builder.toString();
   }
 
-  public Optional<Cell> getBoardCell(Coordinate coordinate) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-
-    return isContain(coordinate) ? Optional.of(
-        this.board.get(coordinate.row).get(coordinate.col))
-        : Optional.<Cell>absent();
-  }
-
   /**
    * Board Helper Methods.
    */
 
-  private boolean isEmptyCell(Coordinate coordinate) {
-    return !getBoardCell(coordinate).get().getPiece().isPresent();
+  private boolean isContain(Coordinate coordinate) {
+    return !(coordinate.row < 0
+        || coordinate.row > DIMENSION - 1
+        || coordinate.col < 0
+        || coordinate.col > DIMENSION - 1);
   }
 
-  private boolean isValidMove(Coordinate coordinate, Piece piece) {
-    if (!isContain(coordinate)) {
-      System.out.printf("%s is not valid coordinate", coordinate);
+  private boolean isContain(int row, int col) {
+    return !(row < 0
+        || row > DIMENSION - 1
+        || col < 0
+        || col > DIMENSION - 1);
+  }
+
+  private boolean isValid() {
+    if (this.board.size() != DIMENSION) {
       return false;
     }
 
+    for (List<Cell> row : this.board) {
+      if (row.size() != DIMENSION) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean isEmptyCell(Coordinate coordinate) {
+    return !getBoardCell(coordinate).getPiece().isPresent();
+  }
+
+  private boolean isValidMove(Coordinate coordinate, Piece piece) {
     return isEmptyCell(coordinate) && checkOrFlip(coordinate, piece, true);
   }
 
   private boolean placeAndFlip(Coordinate coordinate, Piece piece) {
     if (!isContain(coordinate)) {
-      throw new IllegalArgumentException(String.format("%s is not valid coordinate", coordinate));
+      throw new IllegalArgumentException(String.format("Invalid coordinate [%s]", coordinate));
     }
 
-    getBoardCell(coordinate).get().setPiece(piece);
-
-    if (isEmptyCell(coordinate)) {
+    if (!isEmptyCell(coordinate)) {
       throw new IllegalArgumentException(
-          String.format("%s is empty, and cannot placeAndFlip board from here.", coordinate));
+          String.format("Not empty cell [%s]", coordinate));
     }
+
+    getBoardCell(coordinate).setPiece(piece);
 
     return checkOrFlip(coordinate, piece, false);
   }
@@ -316,11 +318,11 @@ public class Board {
 
     for (Coordinate direction : DIRECTIONS) {
       Coordinate neighbourCoordinate = coordinate.move(direction);
-      Optional<Cell> optionalCell = getBoardCell(neighbourCoordinate);
-      if (!optionalCell.isPresent()) {
+      if (!isContain(neighbourCoordinate)) {
         continue;
       }
-      Cell currentCell = optionalCell.get();
+
+      Cell currentCell = getBoardCell(neighbourCoordinate);
       if (!currentCell.getPiece().isPresent()) {
         continue;
       }
@@ -330,12 +332,11 @@ public class Board {
 
       while (true) {
         Coordinate endCoordinate = currentCell.getCoordinate().move(direction);
-        optionalCell = getBoardCell(endCoordinate);
-        if (!optionalCell.isPresent()) {
+        if (!isContain(endCoordinate)) {
           break;
         }
 
-        Cell endCell = optionalCell.get();
+        Cell endCell = getBoardCell(endCoordinate);
         if (!endCell.getPiece().isPresent()) {
           break;
         }
@@ -371,16 +372,7 @@ public class Board {
     Cell currentCell = start;
     while (currentCell != end) {
       currentCell.setPiece(end.getPiece().get());
-
-      Optional<Cell> optional = getBoardCell(currentCell.getCoordinate().move(direction));
-
-      if (optional.isPresent()) {
-        currentCell = optional.get();
-      } else {
-        throw new IllegalArgumentException(
-            String.format("Empty cell in the line of %s - %s with direction %s",
-                start.getCoordinate(), end.getCoordinate(), direction));
-      }
+      currentCell = getBoardCell(currentCell.getCoordinate().move(direction));
     }
   }
 }

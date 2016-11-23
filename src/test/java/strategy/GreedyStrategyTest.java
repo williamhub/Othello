@@ -2,7 +2,6 @@ package strategy;
 
 import engine.GameEngine;
 import model.Piece;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
