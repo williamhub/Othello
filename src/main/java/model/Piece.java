@@ -5,7 +5,7 @@ public enum Piece {
 
   private final String text;
 
-  private Piece(String text) {
+  Piece(String text) {
     this.text = text;
   }
 

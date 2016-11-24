@@ -13,14 +13,11 @@ public class MinMaxTree {
 
   private TreeNode root;
 
-  private AlphaBeta alphaBeta;
-
   private HeuristicMethod heuristicMethod;
 
   public MinMaxTree(Board board, Piece piece, HeuristicMethod heuristicMethod) {
     this.root = new TreeNode(board, piece);
     this.heuristicMethod = heuristicMethod;
-    this.alphaBeta = new AlphaBeta(Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
 
   public TreeNode getRoot() {
@@ -28,19 +25,25 @@ public class MinMaxTree {
   }
 
   public TreeNode getNextNode() {
-    getNextNode(getRoot(), LEVELS + 1);
+    getNextNode(getRoot(), LEVELS, Integer.MIN_VALUE, Integer.MAX_VALUE);
     return getRoot().getChosenChild();
   }
 
-  private int getNextNode(TreeNode parent, final int restLevels) {
+  private int getNextNode(TreeNode parent, final int restLevels, int alpha, int beta) {
     if (restLevels == 0) {
-      return getHeuristicValue(parent);
+      return getHeuristicValueLeafNode(parent);
+    }
+
+    if (parent.getBoard().isOver()) {
+      return getHeuristicValueNonLeafNode(parent);
     }
 
     List<Coordinate> childes = parent.getValidBoardMoves();
 
+    /* No available moves for current board */
     if (childes.isEmpty()) {
-      return getHeuristicValue(parent);
+      TreeNode copiedNode = new TreeNode(parent.getBoard(), parent.getCurrentPiece().getOpposite());
+      return getNextNode(copiedNode, restLevels - 1, alpha, beta);
     }
 
     switch (parent.getCurrentPiece()) {
@@ -49,7 +52,7 @@ public class MinMaxTree {
 
         for (Coordinate coordinate : childes) {
           TreeNode childNode = parent.getValidChild(coordinate);
-          int heuristicScore = getNextNode(childNode, restLevels - 1);
+          int heuristicScore = getNextNode(childNode, restLevels - 1, alpha, beta);
 
           if (maxChild == null) {
             maxChild = childNode;
@@ -59,23 +62,24 @@ public class MinMaxTree {
             }
           }
 
-          if (heuristicScore > alphaBeta.alpha) {
-            alphaBeta.alpha = heuristicScore;
+          if (heuristicScore > alpha) {
+            alpha = heuristicScore;
           }
-          if (alphaBeta.alpha >= alphaBeta.beta) {
+          if (alpha >= beta) {
             // beta cut-off
             break;
           }
         }
 
         parent.setChosenChild(maxChild);
-        return alphaBeta.alpha;
+        parent.setHeuristicScore(maxChild.getHeuristicScore());
+        return alpha;
       case WHITE:
         TreeNode minChild = null;
 
         for (Coordinate coordinate : childes) {
           TreeNode childNode = parent.getValidChild(coordinate);
-          int heuristicScore = getNextNode(childNode, restLevels - 1);
+          int heuristicScore = getNextNode(childNode, restLevels - 1, alpha, beta);
 
           if (minChild == null) {
             minChild = childNode;
@@ -85,49 +89,56 @@ public class MinMaxTree {
             }
           }
 
-          if (heuristicScore < alphaBeta.beta) {
-            alphaBeta.beta = heuristicScore;
+          if (heuristicScore < beta) {
+            beta = heuristicScore;
           }
-          if (alphaBeta.alpha >= alphaBeta.beta) {
+          if (alpha >= beta) {
             // alpha cut-off
             break;
           }
         }
 
         parent.setChosenChild(minChild);
-        return alphaBeta.beta;
+        parent.setHeuristicScore(minChild.getHeuristicScore());
+        return beta;
       default:
         throw new IllegalArgumentException(
             String.format("Unknown piece [%s]", parent.getCurrentPiece()));
     }
   }
 
-  private int getHeuristicValue(TreeNode leafNode) {
-    Board board = leafNode.getBoard();
+  private int getHeuristicValueLeafNode(TreeNode treeNode) {
+    int result = 0;
+
+    Board board = treeNode.getBoard();
     if (board.isOver()) {
-      GameResult gameResult = board.getWinner();
-      switch (gameResult) {
-        case BLACK:
-          return Integer.MAX_VALUE;
-        case WHITE:
-          return Integer.MIN_VALUE;
-        case TIE:
-          return 0;
-        default:
-          throw new IllegalArgumentException(
-              String.format("Unknown game result [%s]", gameResult));
-      }
+      result = getBoardHeuristicValue(board);
+    } else {
+      result = heuristicMethod.getResult(treeNode);
     }
-    return heuristicMethod.getResult(leafNode);
+    treeNode.setHeuristicScore(result);
+
+    return result;
   }
 
-  private class AlphaBeta {
-    public int alpha;
-    public int beta;
+  private int getHeuristicValueNonLeafNode(TreeNode treeNode) {
+    int result = getBoardHeuristicValue(treeNode.getBoard());
+    treeNode.setHeuristicScore(result);
+    return result;
+  }
 
-    public AlphaBeta(int alpha, int beta) {
-      this.alpha = alpha;
-      this.beta = beta;
+  private int getBoardHeuristicValue(Board board) {
+    GameResult gameResult = board.getWinner();
+    switch (gameResult) {
+      case BLACK:
+        return 10000000;
+      case WHITE:
+        return -10000000;
+      case TIE:
+        return 0;
+      default:
+        throw new IllegalArgumentException(
+            String.format("Unknown game result [%s]", gameResult));
     }
   }
 }

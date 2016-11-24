@@ -17,4 +17,16 @@ public class MinMaxTreeTest {
     // TODO: min max tree test
     System.out.println(treeNode.getBoard());
   }
+
+  @Test public void testGetNextNodeOverBeforeLeaf() {
+    Board board = Board.newInstance("strategy/minmax_over_before_leaf_board.txt");
+    MinMaxTree minMaxTree = new MinMaxTree(board, Piece.BLACK, new MobilityMethod());
+
+    TreeNode treeNode = minMaxTree.getNextNode();
+    System.out.println(treeNode.getBoard());
+  }
+
+  @Test public void testGetNextNodeSkipNode() {
+
+  }
 }

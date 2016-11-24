@@ -54,8 +54,6 @@ public class StableMethod implements HeuristicMethod {
       }
     }
 
-    int result = blackResult - whiteResult;
-    leafNode.setHeuristicScore(result);
-    return result;
+    return blackResult - whiteResult;
   }
 }
