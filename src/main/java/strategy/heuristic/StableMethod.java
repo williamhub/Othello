@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import model.Board;
-import model.GameResult;
 import model.Piece;
 import model.TreeNode;
 
@@ -27,20 +26,6 @@ public class StableMethod implements HeuristicMethod {
   @Override
   public int getResult(TreeNode leafNode) {
     Board board = leafNode.getBoard();
-    if (board.isOver()) {
-      GameResult gameResult = board.getWinner();
-      switch (gameResult) {
-        case BLACK:
-          return Integer.MAX_VALUE;
-        case WHITE:
-          return Integer.MIN_VALUE;
-        case TIE:
-          return 0;
-        default:
-          throw new IllegalArgumentException(
-              String.format("Unknown game result [%s]", gameResult));
-      }
-    }
 
     int whiteResult = 0;
     int blackResult = 0;

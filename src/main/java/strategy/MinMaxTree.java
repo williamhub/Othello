@@ -3,6 +3,7 @@ package strategy;
 import java.util.List;
 import model.Board;
 import model.Coordinate;
+import model.GameResult;
 import model.Piece;
 import model.TreeNode;
 import strategy.heuristic.HeuristicMethod;
@@ -33,10 +34,15 @@ public class MinMaxTree {
 
   private int getNextNode(TreeNode parent, final int restLevels) {
     if (restLevels == 0) {
-      return heuristicMethod.getResult(parent);
+      return getHeuristicValue(parent);
     }
 
     List<Coordinate> childes = parent.getValidBoardMoves();
+
+    if (childes.isEmpty()) {
+      return getHeuristicValue(parent);
+    }
+
     switch (parent.getCurrentPiece()) {
       case BLACK:
         TreeNode maxChild = null;
@@ -94,6 +100,25 @@ public class MinMaxTree {
         throw new IllegalArgumentException(
             String.format("Unknown piece [%s]", parent.getCurrentPiece()));
     }
+  }
+
+  private int getHeuristicValue(TreeNode leafNode) {
+    Board board = leafNode.getBoard();
+    if (board.isOver()) {
+      GameResult gameResult = board.getWinner();
+      switch (gameResult) {
+        case BLACK:
+          return Integer.MAX_VALUE;
+        case WHITE:
+          return Integer.MIN_VALUE;
+        case TIE:
+          return 0;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown game result [%s]", gameResult));
+      }
+    }
+    return heuristicMethod.getResult(leafNode);
   }
 
   private class AlphaBeta {
