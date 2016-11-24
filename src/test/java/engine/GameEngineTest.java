@@ -70,4 +70,24 @@ public class GameEngineTest {
     assertEquals(expected, actual);
   }
 
+  @Test public void testPlacePieceByHumanInvalidStep() {
+    GameEngine gameEngine =
+        new GameEngine(new GreedyStrategy(), "engine/last_step_board.txt");
+    gameEngine.placePieceByHuman(new Coordinate(9, 9), Piece.BLACK);
+    gameEngine.placePieceByHuman(new Coordinate(1, 1), Piece.BLACK);
+    gameEngine.placePieceByHuman(new Coordinate(7, 0), Piece.WHITE);
+
+    String expected =
+        "WWWWWWWW\n"
+            + "BWBBBBBB\n"
+            + "WWWBWWBB\n"
+            + "WWBWWWWB\n"
+            + "WWWWWWWB\n"
+            + "WWWWWWWB\n"
+            + "WWWWWWWB\n"
+            + "00WWWWWB\n";
+
+    String actual = gameEngine.getBoardLayout();
+    assertEquals(expected, actual);
+  }
 }

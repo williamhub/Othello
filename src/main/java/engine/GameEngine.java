@@ -28,6 +28,11 @@ public class GameEngine {
     checkArgument(coordinate != null, "Coordinate must be set");
     checkArgument(piece != null, "Piece must be set");
 
+    if (!this.board.isContain(coordinate) || !this.board.isValidMove(coordinate, piece)) {
+      System.err.printf("Invalid coordinate [%s]\n", coordinate);
+      return;
+    }
+
     this.board = this.board.placePiece(coordinate, piece);
     if (isOver()) {
       return;

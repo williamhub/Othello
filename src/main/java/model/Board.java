@@ -243,6 +243,17 @@ public class Board {
     return this.board.get(row).get(col);
   }
 
+  public boolean isContain(Coordinate coordinate) {
+    return !(coordinate.row < 0
+        || coordinate.row > DIMENSION - 1
+        || coordinate.col < 0
+        || coordinate.col > DIMENSION - 1);
+  }
+
+  public boolean isValidMove(Coordinate coordinate, Piece piece) {
+    return isEmptyCell(coordinate) && checkOrFlip(coordinate, piece, true);
+  }
+
   public String toString() {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < DIMENSION; row++) {
@@ -259,11 +270,8 @@ public class Board {
    * Board Helper Methods.
    */
 
-  private boolean isContain(Coordinate coordinate) {
-    return !(coordinate.row < 0
-        || coordinate.row > DIMENSION - 1
-        || coordinate.col < 0
-        || coordinate.col > DIMENSION - 1);
+  private boolean isEmptyCell(Coordinate coordinate) {
+    return !getBoardCell(coordinate).getPiece().isPresent();
   }
 
   private boolean isContain(int row, int col) {
@@ -286,24 +294,7 @@ public class Board {
     return true;
   }
 
-  private boolean isEmptyCell(Coordinate coordinate) {
-    return !getBoardCell(coordinate).getPiece().isPresent();
-  }
-
-  private boolean isValidMove(Coordinate coordinate, Piece piece) {
-    return isEmptyCell(coordinate) && checkOrFlip(coordinate, piece, true);
-  }
-
   private boolean placeAndFlip(Coordinate coordinate, Piece piece) {
-    if (!isContain(coordinate)) {
-      throw new IllegalArgumentException(String.format("Invalid coordinate [%s]", coordinate));
-    }
-
-    if (!isEmptyCell(coordinate)) {
-      throw new IllegalArgumentException(
-          String.format("Not empty cell [%s]", coordinate));
-    }
-
     getBoardCell(coordinate).setPiece(piece);
 
     return checkOrFlip(coordinate, piece, false);
