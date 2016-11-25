@@ -6,7 +6,6 @@ import java.util.List;
 import utils.FileReaderUtil;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 
 public class Board {
   private final static int DIMENSION = 8;
@@ -187,9 +186,6 @@ public class Board {
   }
 
   public Board placePiece(Coordinate coordinate, Piece piece) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-    checkArgument(piece != null, "Piece must be set");
-
     Board newBoard = newInstance(this.board);
     newBoard.placeAndFlip(coordinate, piece);
     return newBoard;
@@ -247,8 +243,6 @@ public class Board {
   }
 
   public Cell getBoardCell(Coordinate coordinate) {
-    checkArgument(coordinate != null, "Coordinate must be set");
-
     if (!isContain(coordinate)) {
       throw new IllegalArgumentException(String.format("Invalid coordinate [%s]", coordinate));
     }
@@ -276,6 +270,19 @@ public class Board {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < DIMENSION; row++) {
+      for (int col = 0; col < DIMENSION; col++) {
+        builder.append(getBoardCell(row, col).toString());
+      }
+      builder.append("\n");
+    }
+
+    return builder.toString();
+  }
+
+  public String toString(String prefix) {
+    StringBuilder builder = new StringBuilder();
+    for (int row = 0; row < DIMENSION; row++) {
+      builder.append(prefix);
       for (int col = 0; col < DIMENSION; col++) {
         builder.append(getBoardCell(row, col).toString());
       }
@@ -322,9 +329,6 @@ public class Board {
   private boolean checkOrFlip(Coordinate coordinate,
       Piece piece,
       boolean isToCheck) {
-    checkState(this.board != null);
-    checkArgument(coordinate != null, "Coordinate must be set");
-    checkArgument(piece != null, "Piece must be set");
 
     for (Coordinate direction : DIRECTIONS) {
       Coordinate neighbourCoordinate = coordinate.move(direction);
@@ -370,12 +374,6 @@ public class Board {
 
   private void flipLine(Cell start, Cell end,
       Coordinate direction) {
-    checkState(this.board != null);
-    checkArgument(start != null, "start Cell must be set");
-    checkArgument(end != null, "end Cell must be set");
-    checkArgument(direction != null, "direction Coordinate must be set");
-    checkArgument(start.getPiece().isPresent(), "start cell piece must be set");
-    checkArgument(end.getPiece().isPresent(), "end cell piece must be set");
     checkArgument(start.getPiece().get() == end.getPiece().get(),
         "start and end cell piece color is not equal");
 
