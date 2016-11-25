@@ -12,7 +12,7 @@ public class MobilityStrategyTest {
     Board board = Board.newInstance("strategy/mobility_game_board.txt");
     Strategy strategy = new MobilityStrategy();
     int actual = strategy.getBoardHeuristicValue(board, Piece.BLACK);
-    int expected = 6;
+    int expected = 0;
 
     assertEquals(expected, actual);
   }
