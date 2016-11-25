@@ -1,5 +1,8 @@
 package engine;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import model.Board;
 import model.Coordinate;
 import model.Piece;
@@ -57,8 +60,20 @@ public class GameEngine {
     placePiece(piece);
   }
 
-  private void placePiece(Piece piece) {
-    this.board = this.strategy.choose(piece, this.board);
+  private void placePiece(final Piece piece) {
+    List<Board> childBoards = this.board.getChildBoards(piece);
+
+    if (childBoards.isEmpty()) {
+      System.out.printf("Skipped [%s] piece step\n", piece);
+      return;
+    }
+
+    this.board = Collections.max(childBoards, new Comparator<Board>() {
+      @Override public int compare(Board board1, Board board2) {
+        return strategy.getBoardHeuristicValue(board1, piece) - strategy.getBoardHeuristicValue(
+            board2, piece);
+      }
+    });
   }
 
   public boolean isOver() {

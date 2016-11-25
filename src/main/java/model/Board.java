@@ -227,6 +227,25 @@ public class Board {
     return result;
   }
 
+  public int getAmountCornerCaptured(Piece piece) {
+    int result = 0;
+
+    if (getBoardCell(0, 0).getPiece().get() == piece) {
+      result++;
+    }
+    if (getBoardCell(0, 7).getPiece().get() == piece) {
+      result++;
+    }
+    if (getBoardCell(7, 0).getPiece().get() == piece) {
+      result++;
+    }
+    if (getBoardCell(7, 7).getPiece().get() == piece) {
+      result++;
+    }
+
+    return result;
+  }
+
   public Cell getBoardCell(Coordinate coordinate) {
     checkArgument(coordinate != null, "Coordinate must be set");
 

@@ -6,18 +6,19 @@ import model.Coordinate;
 import model.GameResult;
 import model.Piece;
 import model.TreeNode;
-import strategy.heuristic.HeuristicMethod;
 
 public class MinMaxTree {
   public final static int LEVELS = 3;
+  public final static int BLACK_WIN_SCORE = 1000000000;
+  public final static int WHITE_WIN_SCORE = -1000000000;
 
   private TreeNode root;
 
-  private HeuristicMethod heuristicMethod;
+  private Strategy strategy;
 
-  public MinMaxTree(Board board, Piece piece, HeuristicMethod heuristicMethod) {
+  public MinMaxTree(Board board, Piece piece, Strategy strategy) {
     this.root = new TreeNode(board, piece);
-    this.heuristicMethod = heuristicMethod;
+    this.strategy = strategy;
   }
 
   public TreeNode getRoot() {
@@ -114,7 +115,7 @@ public class MinMaxTree {
     if (board.isOver()) {
       result = getBoardHeuristicValue(board);
     } else {
-      result = heuristicMethod.getResult(treeNode);
+      result = strategy.getBoardHeuristicValue(treeNode.getBoard(), null);
     }
     treeNode.setHeuristicScore(result);
 
@@ -131,9 +132,9 @@ public class MinMaxTree {
     GameResult gameResult = board.getWinner();
     switch (gameResult) {
       case BLACK:
-        return 10000000;
+        return BLACK_WIN_SCORE;
       case WHITE:
-        return -10000000;
+        return WHITE_WIN_SCORE;
       case TIE:
         return 0;
       default:
