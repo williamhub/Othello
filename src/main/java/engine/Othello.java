@@ -9,7 +9,7 @@ import strategy.GreedyStrategy;
 
 public class Othello {
   public final static int ROBOT_TIME_LIMIT_SECONDS = 10;
-  public final static int HUMAN_TIME_LIMIT_SECONDS = 3;
+  public final static int HUMAN_TIME_LIMIT_SECONDS = 60;
 
   public static void main(String[] args) {
     GameEngine gameEngine = new GameEngine(new GreedyStrategy());

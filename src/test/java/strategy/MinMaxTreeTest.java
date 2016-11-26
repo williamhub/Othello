@@ -20,7 +20,7 @@ public class MinMaxTreeTest {
     MinMaxTree minMaxTree = new MinMaxTree(board, Piece.BLACK, new GreedyStrategy());
 
     TreeNode treeNode = minMaxTree.getNextNode();
-    System.out.println(treeNode.getBoard());
+    //System.out.println(treeNode.getBoard());
   }
 
   @Test public void testGetNextNodeSkipNode() {
