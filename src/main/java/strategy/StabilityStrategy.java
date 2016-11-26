@@ -7,7 +7,12 @@ import java.util.List;
 import model.Board;
 import model.Piece;
 
-public class StableStrategy implements Strategy {
+/**
+ * The stability measure of a coin is a quantitative
+ * representation of how vulnerable it is to being
+ * flanked.
+ */
+public class StabilityStrategy implements Strategy {
 
   private final static List<List<Integer>> STABLE_STRATEGY_METRIC = new ArrayList<>();
 

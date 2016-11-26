@@ -30,6 +30,14 @@ public class MinMaxTree {
     return getRoot().getChosenChild();
   }
 
+  /**
+   * getNextNode returns a treenode selected from its childes according to given strategy.
+   * @param parent
+   * @param restLevels
+   * @param alpha
+   * @param beta
+   * @return
+   */
   private int getNextNode(TreeNode parent, final int restLevels, int alpha, int beta) {
     if (restLevels == 0) {
       return getHeuristicValueLeafNode(parent);

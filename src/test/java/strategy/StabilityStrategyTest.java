@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class StableStrategyTest {
+public class StabilityStrategyTest {
   @Test public void testGetBoardHeuristicValue() {
     Board board = Board.newInstance("strategy/stable_game_board.txt");
-    Strategy strategy = new StableStrategy();
+    Strategy strategy = new StabilityStrategy();
     int actual = strategy.getBoardHeuristicValue(board, Piece.BLACK);
     int expected = 6;
 

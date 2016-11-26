@@ -4,8 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * Reading file util.
+ */
 public class FileReaderUtil {
 
+  /**
+   * Read file from resource folder.
+   *
+   * @param fileName
+   * @return
+   */
   public static String getFile(String fileName) {
 
     StringBuilder result = new StringBuilder("");

@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import model.Coordinate;
 import model.Piece;
+import strategy.CoinParityMinMaxTreeStrategy;
 import strategy.GreedyStrategy;
 
 public class Othello {
@@ -12,7 +13,7 @@ public class Othello {
   public final static int HUMAN_TIME_LIMIT_SECONDS = 60;
 
   public static void main(String[] args) {
-    GameEngine gameEngine = new GameEngine(new GreedyStrategy());
+    GameEngine gameEngine = new GameEngine(new CoinParityMinMaxTreeStrategy());
     System.out.println(gameEngine.getBoardLayout());
 
     Scanner scanner = new Scanner(System.in);

@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Board coordinate used as location of a cell
+ */
 public class Coordinate {
   public int row;
   public int col;

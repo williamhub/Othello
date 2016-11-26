@@ -14,6 +14,8 @@ import java.util.concurrent.TimeoutException;
 import model.Board;
 import model.Coordinate;
 import model.Piece;
+import strategy.CoinParityMinMaxTreeStrategy;
+import strategy.MinMaxTreeStrategy;
 import strategy.Strategy;
 
 public class GameEngine {
@@ -25,14 +27,26 @@ public class GameEngine {
 
   Strategy strategy;
 
+  MinMaxTreeStrategy minMaxTreeStrategy;
+
   public GameEngine(Strategy strategy) {
     this.boardNode = new Node(Board.newInstance());
     this.strategy = strategy;
   }
 
+  public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy) {
+    this.boardNode = new Node(Board.newInstance());
+    this.minMaxTreeStrategy = minMaxTreeStrategy;
+  }
+
   public GameEngine(Strategy strategy, String boardFilePath) {
     this.boardNode = new Node(Board.newInstance(boardFilePath));
     this.strategy = strategy;
+  }
+
+  public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy, String boardFilePath) {
+    this.boardNode = new Node(Board.newInstance(boardFilePath));
+    this.minMaxTreeStrategy = minMaxTreeStrategy;
   }
 
   public void placePieceByHuman(Coordinate coordinate, Piece piece) {
@@ -94,12 +108,16 @@ public class GameEngine {
     }
 
     Node tempNode = new Node(this.boardNode);
-    tempNode.board = Collections.max(childBoards, new Comparator<Board>() {
-      @Override public int compare(Board board1, Board board2) {
-        return strategy.getBoardHeuristicValue(board1, piece) - strategy.getBoardHeuristicValue(
-            board2, piece);
-      }
-    });
+    if (this.strategy == null) {
+      tempNode.board = this.minMaxTreeStrategy.getNextBoard(this.boardNode.board, piece);
+    } else {
+      tempNode.board = Collections.max(childBoards, new Comparator<Board>() {
+        @Override public int compare(Board board1, Board board2) {
+          return strategy.getBoardHeuristicValue(board1, piece) - strategy.getBoardHeuristicValue(
+              board2, piece);
+        }
+      });
+    }
     this.boardNode = tempNode;
   }
 

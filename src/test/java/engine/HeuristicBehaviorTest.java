@@ -5,12 +5,12 @@ import org.junit.Test;
 import strategy.CoinParityStrategy;
 import strategy.CornerCapturedStrategy;
 import strategy.MobilityStrategy;
-import strategy.StableStrategy;
+import strategy.StabilityStrategy;
 
 public class HeuristicBehaviorTest {
   @Test public void testStableStrategy() {
     GameEngine gameEngine =
-        new GameEngine(new StableStrategy(), "engine/heuristic_behavior_board.txt");
+        new GameEngine(new StabilityStrategy(), "engine/heuristic_behavior_board.txt");
     gameEngine.placePieceByRobot(Piece.BLACK);
 
     System.out.println(gameEngine.getBoardLayout());

@@ -3,6 +3,10 @@ package strategy;
 import model.Board;
 import model.Piece;
 
+/**
+ * Mobility is the number of next moves a player
+ * has, given the current state of the game.
+ */
 public class MobilityStrategy implements Strategy {
 
   @Override
