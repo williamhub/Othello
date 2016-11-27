@@ -1,6 +1,8 @@
 package model;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.List;
 import utils.FileReaderUtil;
@@ -42,7 +44,7 @@ public class Board {
 
   public static Board newInstance(String filePath) {
     String rawBoard = FileReaderUtil.getFile(filePath);
-    String[] rawBoardRows = rawBoard.split("\n");
+    String[] rawBoardRows = extractCells(rawBoard);
 
     List<List<Cell>> boardCells = new ArrayList<>();
 
@@ -76,6 +78,12 @@ public class Board {
     }
 
     return newBoard;
+  }
+
+  private static String[] extractCells(String rawBoard) {
+    rawBoard = rawBoard.replaceAll("\\p{P}", "");
+    Iterable<String> rows = Splitter.on("\n").omitEmptyStrings().split(rawBoard);
+    return Iterables.toArray(rows, String.class);
   }
 
   private static Board newInstance(List<List<Cell>> cells) {
@@ -269,12 +277,15 @@ public class Board {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
+    builder.append("(\n");
     for (int row = 0; row < DIMENSION; row++) {
+      builder.append("(");
       for (int col = 0; col < DIMENSION; col++) {
         builder.append(getBoardCell(row, col).toString());
       }
-      builder.append("\n");
+      builder.append(")\n");
     }
+    builder.append(")\n");
 
     return builder.toString();
   }

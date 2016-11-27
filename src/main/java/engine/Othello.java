@@ -1,12 +1,9 @@
 package engine;
 
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import model.Coordinate;
 import model.Piece;
 import strategy.CoinParityMinMaxTreeStrategy;
-import strategy.GreedyStrategy;
 
 public class Othello {
   public final static int ROBOT_TIME_LIMIT_SECONDS = 10;

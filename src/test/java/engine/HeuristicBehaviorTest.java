@@ -7,13 +7,28 @@ import strategy.CornerCapturedStrategy;
 import strategy.MobilityStrategy;
 import strategy.StabilityStrategy;
 
+import static org.junit.Assert.assertEquals;
+
 public class HeuristicBehaviorTest {
   @Test public void testStableStrategy() {
     GameEngine gameEngine =
         new GameEngine(new StabilityStrategy(), "engine/heuristic_behavior_board.txt");
     gameEngine.placePieceByRobot(Piece.BLACK);
 
-    System.out.println(gameEngine.getBoardLayout());
+    String actual = gameEngine.getBoardLayout();
+    String expected =
+        "(\n"
+            + "(00BBBB0B)\n"
+            + "(00BBBB0B)\n"
+            + "(BBBBBBWB)\n"
+            + "(BBBBBWWB)\n"
+            + "(BBBBBWBB)\n"
+            + "(BBBBWBBB)\n"
+            + "(B0WWBB0B)\n"
+            + "(00000B00)\n"
+            + ")\n";
+
+    assertEquals(expected, actual);
   }
 
   @Test public void testMobilityStrategy() {
@@ -21,7 +36,20 @@ public class HeuristicBehaviorTest {
         new GameEngine(new MobilityStrategy(), "engine/heuristic_behavior_board.txt");
     gameEngine.placePieceByRobot(Piece.BLACK);
 
-    System.out.println(gameEngine.getBoardLayout());
+    String actual = gameEngine.getBoardLayout();
+    String expected =
+        "(\n"
+            + "(00BBBB0B)\n"
+            + "(00BBBB0B)\n"
+            + "(BBBBBBWB)\n"
+            + "(BBBBBWWB)\n"
+            + "(BBBBBWBB)\n"
+            + "(BBBBWBBB)\n"
+            + "(B0WWBB0B)\n"
+            + "(00000B00)\n"
+            + ")\n";
+
+    assertEquals(expected, actual);
   }
 
   @Test public void testCornerCapturedStrategy() {
@@ -29,7 +57,20 @@ public class HeuristicBehaviorTest {
         new GameEngine(new CornerCapturedStrategy(), "engine/heuristic_behavior_board.txt");
     gameEngine.placePieceByRobot(Piece.BLACK);
 
-    System.out.println(gameEngine.getBoardLayout());
+    String actual = gameEngine.getBoardLayout();
+    String expected =
+        "(\n"
+            + "(00BBBB0B)\n"
+            + "(00BBBB0B)\n"
+            + "(BBBBBBWB)\n"
+            + "(BBBBBWWB)\n"
+            + "(BBBBBWBB)\n"
+            + "(BBBBWBBB)\n"
+            + "(B0WWBB0B)\n"
+            + "(00000B00)\n"
+            + ")\n";
+
+    assertEquals(expected, actual);
   }
 
   @Test public void testCoinParityStrategy() {
@@ -37,6 +78,19 @@ public class HeuristicBehaviorTest {
         new GameEngine(new CoinParityStrategy(), "engine/heuristic_behavior_board.txt");
     gameEngine.placePieceByRobot(Piece.BLACK);
 
-    System.out.println(gameEngine.getBoardLayout());
+    String actual = gameEngine.getBoardLayout();
+    String expected =
+        "(\n"
+            + "(00BBBB0B)\n"
+            + "(00BBBB0B)\n"
+            + "(BBBBBBWB)\n"
+            + "(BBBBBWWB)\n"
+            + "(BBBBBWBB)\n"
+            + "(BBBBWBBB)\n"
+            + "(B0WWBB0B)\n"
+            + "(00000B00)\n"
+            + ")\n";
+
+    assertEquals(expected, actual);
   }
 }

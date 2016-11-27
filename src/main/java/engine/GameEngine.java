@@ -29,26 +29,49 @@ public class GameEngine {
 
   MinMaxTreeStrategy minMaxTreeStrategy;
 
+  /**
+   * GameEngine without min-max tree strategy
+   * @param strategy
+   */
   public GameEngine(Strategy strategy) {
     this.boardNode = new Node(Board.newInstance());
     this.strategy = strategy;
   }
 
+  /**
+   * GameEngine with min-max tree strategy
+   * @param minMaxTreeStrategy
+   */
   public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy) {
     this.boardNode = new Node(Board.newInstance());
     this.minMaxTreeStrategy = minMaxTreeStrategy;
   }
 
+  /**
+   * GameEngine without min-max tree strategy, and load board from local file
+   * @param strategy
+   * @param boardFilePath
+   */
   public GameEngine(Strategy strategy, String boardFilePath) {
     this.boardNode = new Node(Board.newInstance(boardFilePath));
     this.strategy = strategy;
   }
 
+  /**
+   * GameEngine with min-max tree strategy, and load board from local file
+   * @param minMaxTreeStrategy
+   * @param boardFilePath
+   */
   public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy, String boardFilePath) {
     this.boardNode = new Node(Board.newInstance(boardFilePath));
     this.minMaxTreeStrategy = minMaxTreeStrategy;
   }
 
+  /**
+   * Place a given piece with given coordinate on board, and perform robot action to it.
+   * @param coordinate
+   * @param piece
+   */
   public void placePieceByHuman(Coordinate coordinate, Piece piece) {
     if (!this.boardNode.board.isContain(coordinate) || !this.boardNode.board.isValidMove(coordinate,
         piece)) {
@@ -78,6 +101,10 @@ public class GameEngine {
     }
   }
 
+  /**
+   * Place a piece on board, which is executed in a separate thread.
+   * @param piece
+   */
   public void placePieceByRobot(final Piece piece) {
 
     Future<Void> future = executor.submit(new Callable<Void>() {
@@ -99,6 +126,10 @@ public class GameEngine {
     }
   }
 
+  /**
+   * Place a given piece on board.
+   * @param piece
+   */
   private void placePiece(final Piece piece) {
     List<Board> childBoards = this.boardNode.board.getChildBoards(piece);
 
@@ -121,6 +152,10 @@ public class GameEngine {
     this.boardNode = tempNode;
   }
 
+  /**
+   * Check if the game is over.
+   * @return
+   */
   public boolean isOver() {
     boolean isGameOver = this.boardNode.board.isOver();
     if (isGameOver) {
@@ -129,10 +164,17 @@ public class GameEngine {
     return isGameOver;
   }
 
+  /**
+   * Return current board layout as string.
+   * @return
+   */
   public String getBoardLayout() {
     return this.boardNode.board.toString();
   }
 
+  /**
+   * Print current game state successive boards layout.
+   */
   public void logSuccessiveBoards() {
     Node node = this.boardNode;
     String prefix = "";
@@ -144,6 +186,9 @@ public class GameEngine {
     }
   }
 
+  /**
+   * Search node is used for holding current board and maintaining a pointer to previous node.
+   */
   private class Node {
     public Board board;
     public Node parent;

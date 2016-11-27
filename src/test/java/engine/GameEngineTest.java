@@ -14,14 +14,16 @@ public class GameEngineTest {
         new GameEngine(new GreedyStrategy(), "engine/skip_black_piece_board.txt");
 
     String expected =
-        "00BBBBB0\n"
-            + "00BBBB0B\n"
-            + "BBBBBBBB\n"
-            + "BBBBBBWB\n"
-            + "BBBWBBWB\n"
-            + "BBWBWWBB\n"
-            + "BWWWWW0B\n"
-            + "0BBBBBBB\n";
+        "(\n"
+            + "(00BBBBB0)\n"
+            + "(00BBBB0B)\n"
+            + "(BBBBBBBB)\n"
+            + "(BBBBBBWB)\n"
+            + "(BBBWBBWB)\n"
+            + "(BBWBWWBB)\n"
+            + "(BWWWWW0B)\n"
+            + "(0BBBBBBB)\n"
+            + ")\n";
 
     gameEngine.placePieceByHuman(new Coordinate(6, 7), Piece.BLACK);
 
@@ -35,14 +37,16 @@ public class GameEngineTest {
         new GameEngine(new GreedyStrategy(), "engine/skip_white_piece_board.txt");
 
     String expected =
-        "WWWWW000\n"
-            + "WWWW0000\n"
-            + "WWWWWWW0\n"
-            + "BBBBBB00\n"
-            + "WWWWWWWW\n"
-            + "WWWWWWW0\n"
-            + "WWWWWW00\n"
-            + "WWWWWW00\n";
+        "(\n"
+            + "(WWWWW000)\n"
+            + "(WWWW0000)\n"
+            + "(WWWWWWW0)\n"
+            + "(BBBBBB00)\n"
+            + "(WWWWWWWW)\n"
+            + "(WWWWWWW0)\n"
+            + "(WWWWWW00)\n"
+            + "(WWWWWW00)\n"
+            + ")\n";
 
     gameEngine.placePieceByHuman(new Coordinate(3, 5), Piece.BLACK);
 
@@ -57,14 +61,16 @@ public class GameEngineTest {
     gameEngine.placePieceByHuman(new Coordinate(7, 0), Piece.BLACK);
 
     String expected =
-        "WWWWWWWW\n"
-            + "BWBBBBBB\n"
-            + "BWWBWBBB\n"
-            + "BWBWBWWB\n"
-            + "BWWBWWWB\n"
-            + "BWBWWWWB\n"
-            + "BWWWWWWB\n"
-            + "BWWWWWWB\n";
+        "(\n"
+            + "(WWWWWWWW)\n"
+            + "(BWBBBBBB)\n"
+            + "(BWWBWBBB)\n"
+            + "(BWBWBWWB)\n"
+            + "(BWWBWWWB)\n"
+            + "(BWBWWWWB)\n"
+            + "(BWWWWWWB)\n"
+            + "(BWWWWWWB)\n"
+            + ")\n";
 
     String actual = gameEngine.getBoardLayout();
     assertEquals(expected, actual);
@@ -78,14 +84,16 @@ public class GameEngineTest {
     gameEngine.placePieceByHuman(new Coordinate(7, 0), Piece.WHITE);
 
     String expected =
-        "WWWWWWWW\n"
-            + "BWBBBBBB\n"
-            + "WWWBWWBB\n"
-            + "WWBWWWWB\n"
-            + "WWWWWWWB\n"
-            + "WWWWWWWB\n"
-            + "WWWWWWWB\n"
-            + "00WWWWWB\n";
+        "(\n"
+            + "(WWWWWWWW)\n"
+            + "(BWBBBBBB)\n"
+            + "(WWWBWWBB)\n"
+            + "(WWBWWWWB)\n"
+            + "(WWWWWWWB)\n"
+            + "(WWWWWWWB)\n"
+            + "(WWWWWWWB)\n"
+            + "(00WWWWWB)\n"
+            + ")\n";
 
     String actual = gameEngine.getBoardLayout();
     assertEquals(expected, actual);
