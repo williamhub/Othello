@@ -7,7 +7,7 @@ import model.GameResult;
 import model.Piece;
 import model.TreeNode;
 
-public class MinMaxTree {
+public class MiniMaxTree {
   public final static int LEVELS = 3;
   public final static int BLACK_WIN_SCORE = 1000000000;
   public final static int WHITE_WIN_SCORE = -1000000000;
@@ -16,7 +16,7 @@ public class MinMaxTree {
 
   private Strategy strategy;
 
-  public MinMaxTree(Board board, Piece piece, Strategy strategy) {
+  public MiniMaxTree(Board board, Piece piece, Strategy strategy) {
     this.root = new TreeNode(board, piece);
     this.strategy = strategy;
   }

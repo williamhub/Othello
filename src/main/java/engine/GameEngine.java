@@ -14,8 +14,7 @@ import java.util.concurrent.TimeoutException;
 import model.Board;
 import model.Coordinate;
 import model.Piece;
-import strategy.CoinParityMinMaxTreeStrategy;
-import strategy.MinMaxTreeStrategy;
+import strategy.MiniMaxTreeStrategy;
 import strategy.Strategy;
 
 public class GameEngine {
@@ -23,11 +22,11 @@ public class GameEngine {
 
   private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-  Node boardNode;
+  private Node boardNode;
 
-  Strategy strategy;
+  private Strategy strategy;
 
-  MinMaxTreeStrategy minMaxTreeStrategy;
+  private MiniMaxTreeStrategy miniMaxTreeStrategy;
 
   /**
    * GameEngine without min-max tree strategy
@@ -40,11 +39,11 @@ public class GameEngine {
 
   /**
    * GameEngine with min-max tree strategy
-   * @param minMaxTreeStrategy
+   * @param miniMaxTreeStrategy
    */
-  public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy) {
+  public GameEngine(MiniMaxTreeStrategy miniMaxTreeStrategy) {
     this.boardNode = new Node(Board.newInstance());
-    this.minMaxTreeStrategy = minMaxTreeStrategy;
+    this.miniMaxTreeStrategy = miniMaxTreeStrategy;
   }
 
   /**
@@ -59,12 +58,12 @@ public class GameEngine {
 
   /**
    * GameEngine with min-max tree strategy, and load board from local file
-   * @param minMaxTreeStrategy
+   * @param miniMaxTreeStrategy
    * @param boardFilePath
    */
-  public GameEngine(MinMaxTreeStrategy minMaxTreeStrategy, String boardFilePath) {
+  public GameEngine(MiniMaxTreeStrategy miniMaxTreeStrategy, String boardFilePath) {
     this.boardNode = new Node(Board.newInstance(boardFilePath));
-    this.minMaxTreeStrategy = minMaxTreeStrategy;
+    this.miniMaxTreeStrategy = miniMaxTreeStrategy;
   }
 
   /**
@@ -140,7 +139,7 @@ public class GameEngine {
 
     Node tempNode = new Node(this.boardNode);
     if (this.strategy == null) {
-      tempNode.board = this.minMaxTreeStrategy.getNextBoard(this.boardNode.board, piece);
+      tempNode.board = this.miniMaxTreeStrategy.getNextBoard(this.boardNode.board, piece);
     } else {
       tempNode.board = Collections.max(childBoards, new Comparator<Board>() {
         @Override public int compare(Board board1, Board board2) {

@@ -3,14 +3,14 @@ package engine;
 import java.util.Scanner;
 import model.Coordinate;
 import model.Piece;
-import strategy.CoinParityMinMaxTreeStrategy;
+import strategy.CoinParityMiniMaxTreeStrategy;
 
 public class Othello {
   public final static int ROBOT_TIME_LIMIT_SECONDS = 10;
   public final static int HUMAN_TIME_LIMIT_SECONDS = 60;
 
   public static void main(String[] args) {
-    GameEngine gameEngine = new GameEngine(new CoinParityMinMaxTreeStrategy());
+    GameEngine gameEngine = new GameEngine(new CoinParityMiniMaxTreeStrategy());
     System.out.println(gameEngine.getBoardLayout());
 
     Scanner scanner = new Scanner(System.in);

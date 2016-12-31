@@ -11,9 +11,6 @@ public class FileReaderUtil {
 
   /**
    * Read file from resource folder.
-   *
-   * @param fileName
-   * @return
    */
   public static String getFile(String fileName) {
 
@@ -28,8 +25,6 @@ public class FileReaderUtil {
         String line = scanner.nextLine();
         result.append(line).append("\n");
       }
-
-      scanner.close();
     } catch (IOException e) {
       e.printStackTrace();
     }

@@ -11,6 +11,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class Board {
   private final static int DIMENSION = 8;
+  private final static char EMPTY_CHARACTER = '0';
+  private final static char BLACK_CHARACTER = 'B';
+  private final static char WHITE_CHARACTER = 'W';
 
   private final static List<Coordinate> DIRECTIONS = new ArrayList<>();
 
@@ -51,16 +54,17 @@ public class Board {
     for (int row = 0; row < rawBoardRows.length; row++) {
       String rawBoardRow = rawBoardRows[row];
       List<Cell> rowCells = new ArrayList<>();
+
       for (int col = 0; col < rawBoardRow.length(); col++) {
         Coordinate coordinate = new Coordinate(row, col);
         switch (rawBoardRow.charAt(col)) {
-          case '0':
+          case EMPTY_CHARACTER:
             rowCells.add(new Cell(coordinate));
             break;
-          case 'B':
+          case BLACK_CHARACTER:
             rowCells.add(new Cell(Piece.BLACK, coordinate));
             break;
-          case 'W':
+          case WHITE_CHARACTER:
             rowCells.add(new Cell(Piece.WHITE, coordinate));
             break;
           default:
